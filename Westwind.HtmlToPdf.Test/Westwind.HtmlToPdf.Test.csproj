@@ -20,11 +20,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WestWind.PdfToHtml\WestWind.HtmlToPdf.csproj" />
+    <ProjectReference Include="..\WestWind.HtmlToPdf\WestWind.HtmlToPdf.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="HtmlSampleFile-SelfContained.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="HtmlSampleFileLonger-SelfContained.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

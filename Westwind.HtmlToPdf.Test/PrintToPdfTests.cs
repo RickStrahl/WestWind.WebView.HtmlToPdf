@@ -1,38 +1,38 @@
 using System.Diagnostics;
 using System.IO;
 using Westwind.Utilities;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using WestWind.HtmlToPdf;
 
 namespace Westwind.PdfToHtml.Test
 {
-    
+
     [TestClass]
     public class PrintToPdfTests
     {
+
+        /// <summary>
+        /// Event callback on completion - to file
+        /// </summary>
+        /// <remarks>
+        /// Using async here only to facilitate waiting for completion.
+        /// actual call does not require async calling method
+        /// </remarks>
         [TestMethod]
         public async Task PrintToPdfFileTest()
         {
-            var outputFile = @"c:\temp\test2.pdf";
-            var htmlFile = "C:/Temp/Temp_Local/_MarkdownMonster_Preview.html";
+            var outputFile = Path.GetFullPath(@".\test.pdf");
+
+            // File or URL
+            var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
 
             File.Delete(outputFile);
 
-            var host = new PdfPrintHost();
-            host.WebViewPrintSettings = new WebViewPrintSettings()
-            {         
-                MarginBottom = 0.2F,
-                MarginLeft = 0.2f,
-                MarginRight = 0.2f,
-                MarginTop = 0.4f,
-                ScaleFactor = 0.75f,                
-                ShouldPrintHeaderandFooter = false,                
-            };
+            var host = new HtmlToPdfHost();            
             host.OnPrintCompleteAction = (result) =>
             {
                 if (result.IsSuccess)
                 {
-                    ShellUtils.GoUrl(outputFile);
+                    ShellUtils.OpenUrl(outputFile);
                     Assert.IsTrue(true);
                 }
                 else
@@ -40,8 +40,20 @@ namespace Westwind.PdfToHtml.Test
                     Assert.Fail(result.Message);
                 }
             };
-            host.PrintToPdf(htmlFile, outputFile);
-            
+            var pdfPrintSettings = new WebViewPrintSettings()
+            {
+                MarginBottom = 0.2F,
+                MarginLeft = 0.2f,
+                MarginRight = 0.2f,
+                MarginTop = 0.4f,
+                ScaleFactor = 0.8f,
+                ColorMode = "Grayscale",    // this doesn't work: https://github.com/MicrosoftEdge/WebView2Feedback/issues/4445
+                ShouldPrintBackgrounds = false,
+                ShouldPrintHeaderandFooter = false,
+            };
+            host.PrintToPdf(htmlFile, outputFile, pdfPrintSettings);
+
+            // have to wait for completion of event callback
             for (int i = 0; i < 50; i++)
             {
                 if (host.IsComplete)
@@ -50,127 +62,115 @@ namespace Westwind.PdfToHtml.Test
                 await Task.Delay(100);
             }
 
-            Assert.Fail ("Document did not complete in time.");
+            Assert.Fail("Document did not complete in time.");
         }
 
-        
+
+        /// <summary>
+        /// Event callback on completion - to stream (in-memory)
+        /// </summary>
+        /// <remarks>
+        /// Using async here only to facilitate waiting for completion.
+        /// actual call does not require async calling method
+        /// </remarks>
         [TestMethod]
-        public async Task PrintToPdfAsyncTest()
+        public async Task PrintToPdfStreamTest()
         {
-            // We have to force the thread to be STA for the
-            // async, non-event version to work so this setup is
-            // a bit ugly
-            var thread = new Thread(PrintToPdfAsyncTest_Run);
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            // File or URL
+            var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");                       
 
-            var testComplete = false;
-
-            async void PrintToPdfAsyncTest_Run()
+            var host = new HtmlToPdfHost();
+            host.OnPrintCompleteAction = (result) =>
             {
-                var outputFile = @"c:\temp\test2.pdf";
-                var htmlFile = "file:///C:/Temp/Temp_Local/_MarkdownMonster_Preview.html";
-
-                File.Delete(outputFile);
-
-                var host = new PdfPrintHost();
-                host.WebViewPrintSettings = new WebViewPrintSettings()
+                if (result.IsSuccess)
                 {
-                    HeaderTitle = "Markdown Monster",
-                    MarginBottom = 0.2F,
-                    MarginLeft = 0.2f,
-                    MarginRight = 0.2f,
-                    MarginTop = 0.4f,
-                    ScaleFactor = 1,
-                    ShouldPrintHeaderandFooter = true,
-                    ColorMode = "Grayscale",
-                    FooterUri = "https://west-wind.com"
-                };
-                var result = await host.PrintToPdfAsync(htmlFile, outputFile);
+                    // create file so we can display
+                    var outputFile = Path.GetFullPath(@".\test1.pdf");
+                    File.Delete(outputFile);
 
-                Assert.IsTrue(result.IsSuccess, result.Message);
-                ShellUtils.GoUrl(outputFile);
-                
-                testComplete = true;
-            }
+                    using var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write);
+                    result.ResultStream.CopyTo(fstream);
 
-            for (int i = 0; i < 100; i++)
-            {
-                if (testComplete)
-                    return;
+                    result.ResultStream.Close(); // Close returned stream!
 
-                await Task.Delay(100);
-            }            
-        }
-
-        
-
-
-        [TestMethod]
-        public async Task PrintToPdfStreamAsyncTest()
-        {
-            // We have to force the thread to be STA for the
-            // async, non-event version to work so this setup is
-            // a bit ugly
-            var thread = new Thread(PrintToPdfStreamAsyncTest_Run);
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-
-            var testComplete = false;
-            async void PrintToPdfStreamAsyncTest_Run()
-            {
-                var outputFile = @"c:\temp\test2.pdf";
-                var htmlFile = "file:///C:/Temp/Temp_Local/_MarkdownMonster_Preview.html";
-
-                File.Delete(outputFile);
-
-                var host = new PdfPrintHost();
-                host.WebViewPrintSettings = new WebViewPrintSettings()
+                    ShellUtils.OpenUrl(outputFile);
+                    Assert.IsTrue(true);
+                }
+                else
                 {
-                    HeaderTitle = "Markdown Monster",
-                    MarginBottom = 0.2F,
-                    MarginLeft = 0.2f,
-                    MarginRight = 0.2f,
-                    MarginTop = 0.4f,
-                    ScaleFactor = 1,
-                    ShouldPrintHeaderandFooter = true,
-                    ColorMode = "Grayscale",
-                    FooterUri = "https://west-wind.com"
-                };
-                var result = await host.PrintToPdfStreamAsync("https://markdownmonster.west-wind.com"); // htmlFile);
-
-                Assert.IsTrue(result.IsSuccess, result.Message);
-                Assert.IsNotNull(result.ResultStream);
-
-                Debug.WriteLine($"Stream Length: {result.ResultStream.Length}");
-
-                // Copy resultstream to output file
-                using var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write);
-                result.ResultStream.CopyTo(fstream);
-                result.ResultStream.Close();
-
-                ShellUtils.GoUrl(outputFile);
-                testComplete = true;
-            }
-
-            for (int i = 0; i < 100; i++)
+                    Assert.Fail(result.Message);
+                }
+            };
+            var pdfPrintSettings = new WebViewPrintSettings()
             {
-                if (testComplete)
+                MarginBottom = 0.2F,
+                MarginLeft = 0.2f,
+                MarginRight = 0.2f,
+                MarginTop = 0.4f,
+                ScaleFactor = 0.8f,
+                ColorMode = "Grayscale",    // this doesn't work: https://github.com/MicrosoftEdge/WebView2Feedback/issues/4445
+                ShouldPrintBackgrounds = false,
+                ShouldPrintHeaderandFooter = false,
+            };
+            host.PrintToPdfStream(htmlFile, pdfPrintSettings);
+
+            for (int i = 0; i < 50; i++)
+            {
+                if (host.IsComplete)
                     return;
 
                 await Task.Delay(100);
             }
+
+            Assert.Fail("Document did not complete in time.");
         }
 
-        private async void PrintToPdfStreamAsyncTest_Run()
+
+        /// <summary>
+        /// Async Result operation - to file
+        /// </summary>
+        [TestMethod]
+        public async Task PrintToPdfFileAsyncTest()
         {
-            var outputFile = @"c:\temp\test2.pdf";
-            var htmlFile = "file:///C:/Temp/Temp_Local/_MarkdownMonster_Preview.html";
+            var outputFile = Path.GetFullPath(@".\test2.pdf");
+            var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
 
             File.Delete(outputFile);
 
-            var host = new PdfPrintHost();
-            host.WebViewPrintSettings = new WebViewPrintSettings()
+            var host = new HtmlToPdfHost();
+            var pdfPrintSettings = new WebViewPrintSettings()
+            {
+                HeaderTitle = "Markdown Monster",
+                MarginBottom = 0.2F,
+                MarginLeft = 0.2f,
+                MarginRight = 0.2f,
+                MarginTop = 0.4f,
+                ScaleFactor = 0.8F,
+                ShouldPrintHeaderandFooter = false,
+                ColorMode = "Grayscale",  // this doesn't work   
+                FooterUri = "https://west-wind.com"
+            };
+            var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
+
+            Assert.IsTrue(result.IsSuccess, result.Message);
+            ShellUtils.OpenUrl(outputFile);
+        }
+
+
+
+        /// <summary>
+        /// Async Result Operation - to stream      
+        /// </summary>        
+        [TestMethod]
+        public async Task PrintToPdfStreamAsyncTest()
+        {
+            var outputFile = Path.GetFullPath(@".\test3.pdf");
+            var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+
+            File.Delete(outputFile);
+
+            var host = new HtmlToPdfHost();
+            var pdfPrintSettings = new WebViewPrintSettings()
             {
                 HeaderTitle = "Markdown Monster",
                 MarginBottom = 0.2F,
@@ -178,17 +178,29 @@ namespace Westwind.PdfToHtml.Test
                 MarginRight = 0.2f,
                 MarginTop = 0.4f,
                 ScaleFactor = 1,
-                ShouldPrintHeaderandFooter = true,
+                ShouldPrintHeaderandFooter = false,
                 ColorMode = "Grayscale",
                 FooterUri = "https://west-wind.com"
             };
-            var result = await  host.PrintToPdfStreamAsync(htmlFile);
+
+            // We're interested in result.ResultStream
+            var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);
 
             Assert.IsTrue(result.IsSuccess, result.Message);
-            Assert.IsNotNull(result.ResultStream);
+            Assert.IsNotNull(result.ResultStream); // THIS
 
             Debug.WriteLine($"Stream Length: {result.ResultStream.Length}");
-           
+
+            // Copy resultstream to output file
+            File.Delete(outputFile);
+
+            using var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write);
+            result.ResultStream.CopyTo(fstream);
+
+            result.ResultStream.Close(); // Close returned stream!
+
+            ShellUtils.OpenUrl(outputFile);
         }
     }
+
 }

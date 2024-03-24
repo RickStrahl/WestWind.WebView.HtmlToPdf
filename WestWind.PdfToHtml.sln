@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WestWind.HtmlToPdf", "WestW
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Westwind.HtmlToPdf.Test", "Westwind.HtmlToPdf.Test\Westwind.HtmlToPdf.Test.csproj", "{413ED39E-1965-40D7-88B0-CA5DF91FDF89}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Westwind.WebView.HtmlToPdf", "Westwind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj", "{131D4777-761C-42E8-A36F-AAE6661EDCF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{413ED39E-1965-40D7-88B0-CA5DF91FDF89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{413ED39E-1965-40D7-88B0-CA5DF91FDF89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{413ED39E-1965-40D7-88B0-CA5DF91FDF89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{131D4777-761C-42E8-A36F-AAE6661EDCF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{131D4777-761C-42E8-A36F-AAE6661EDCF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{131D4777-761C-42E8-A36F-AAE6661EDCF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{131D4777-761C-42E8-A36F-AAE6661EDCF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

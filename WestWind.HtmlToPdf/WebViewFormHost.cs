@@ -12,7 +12,7 @@ namespace WestWind.HtmlToPdf
         
         private string _outputFile { get; set; }
         
-        public PdfPrintHost PdfPrintHost { get; set; }
+        public HtmlToPdfHost HtmlToPdfHost { get; set; }
 
         public bool IsSuccess { get; set; } = false;
 
@@ -23,9 +23,9 @@ namespace WestWind.HtmlToPdf
 
         private PdfPrintOutputModes PdfPrintOutputMode { get; set; } = PdfPrintOutputModes.File;
 
-        public WebViewFormHost(PdfPrintHost printHost)
+        public WebViewFormHost(HtmlToPdfHost printHost)
         {
-            PdfPrintHost = printHost;
+            HtmlToPdfHost = printHost;
 
             InitializeComponent();
 
@@ -72,6 +72,7 @@ namespace WestWind.HtmlToPdf
         public async Task PrintToPdf()
         {
             var webViewPrintSettings = SetWebViewPrintSettings();
+            
         
             if(File.Exists(_outputFile))
                 File.Delete(_outputFile);
@@ -131,6 +132,7 @@ namespace WestWind.HtmlToPdf
         private CoreWebView2PrintSettings SetWebViewPrintSettings()
         {
             var wvps = WebView.CoreWebView2.Environment.CreatePrintSettings();
+            
             var ps = WebViewPrintSettings;
 
             wvps.ScaleFactor = ps.ScaleFactor;
@@ -146,6 +148,7 @@ namespace WestWind.HtmlToPdf
 
             wvps.HeaderTitle = ps.HeaderTitle;
             wvps.ShouldPrintHeaderAndFooter = ps.ShouldPrintHeaderandFooter;
+            wvps.ShouldPrintBackgrounds = ps.ShouldPrintBackgrounds;
             wvps.FooterUri = ps.FooterUri;
             
             wvps.PagesPerSide = ps.PagesPerSide;

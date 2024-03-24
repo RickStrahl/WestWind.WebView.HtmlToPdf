@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework> 
-    <UseWindowsForms>True</UseWindowsForms>
-	  <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>	  
   </PropertyGroup>
 
   <ItemGroup>
