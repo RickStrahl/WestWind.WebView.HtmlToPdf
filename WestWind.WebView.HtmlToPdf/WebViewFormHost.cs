@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 
-namespace WestWind.HtmlToPdf
+namespace Westwind.WebView.HtmlToPdf
 {
     public partial class WebViewFormHost : Form
     {
@@ -29,16 +29,16 @@ namespace WestWind.HtmlToPdf
 
             InitializeComponent();
 
-            this.WebViewPrintSettings = printHost.WebViewPrintSettings;
+            WebViewPrintSettings = printHost.WebViewPrintSettings;
+
+            InitializeAsync();
         }
 
-        protected override async void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
 
-
+        protected  async void InitializeAsync()
+        {            
             // must create a data folder if running out of a secured folder that can't write like Program Files
-            var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: "c:\\temp\\WebViewEnvironment",
+            var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: HtmlToPdfHost.WebViewEnvironmentPath,
                 options:null);
             
             await WebView.EnsureCoreWebView2Async(environment);
@@ -166,11 +166,5 @@ namespace WestWind.HtmlToPdf
         }
 
         
-    }
-
-    internal enum PdfPrintOutputModes
-    {
-        File,
-        Stream
     }
 }

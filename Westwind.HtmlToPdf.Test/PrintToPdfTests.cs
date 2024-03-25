@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using Westwind.Utilities;
-using WestWind.HtmlToPdf;
+using Westwind.WebView.HtmlToPdf;
 
 namespace Westwind.PdfToHtml.Test
 {

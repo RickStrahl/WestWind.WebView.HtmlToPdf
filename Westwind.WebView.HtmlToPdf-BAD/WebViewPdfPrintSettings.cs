@@ -1,11 +1,11 @@
-﻿namespace WestWind.HtmlToPdf;
+﻿namespace Westwind.WebView.HtmlToPdf;
 
 /// <summary>
 /// Proxy object of Core WebView settings options to avoid requiring
 /// a direct reference to the WebView control in the calling
 /// application/project.
 /// </summary>
-public class WebViewPrintSettings
+public class WebViewPdfPrintSettings
 {
     public float ScaleFactor { get; set; } = 1F;
 

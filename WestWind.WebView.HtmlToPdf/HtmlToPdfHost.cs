@@ -1,10 +1,10 @@
-﻿using Microsoft.Web.WebView2.Core;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
-namespace WestWind.HtmlToPdf
+namespace Westwind.WebView.HtmlToPdf
 {
 
 
@@ -16,7 +16,7 @@ namespace WestWind.HtmlToPdf
     /// * Works only on Windows
     /// * Requires net8.0-windows target to work
     /// </remarks>
-    public class HtmlToPdfHostEx
+    public class HtmlToPdfHost
     {        
         internal WebViewPrintSettings WebViewPrintSettings = new WebViewPrintSettings();
 
@@ -49,15 +49,14 @@ namespace WestWind.HtmlToPdf
         /// 
         /// You get notified via OnPrintCompleteAction 'event' (Action) when the 
         /// output operation is complete.
+        /// 
+        /// This method works in non-UI scenarios as it creates its own STA thread
         /// </summary>
         /// <param name="url">The filename or URL to print to PDF</param>
         /// <param name="outputFile">File to generate the output to</param>
         /// <param name="webViewPrintSettings">PDF output options</param>
         public void PrintToPdf(string url, string outputFile, WebViewPrintSettings webViewPrintSettings = null)
         {
-
-          
-
             WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
 
             PdfPrintResult result = new()
@@ -66,23 +65,20 @@ namespace WestWind.HtmlToPdf
                 Message = "PDF generation didn't complete.",
             };
 
-            Thread thread = new Thread(async () =>
-            {
-                var webView2Environment = await CoreWebView2Environment.CreateAsync();
-                var wv = await webView2Environment.CreateCoreWebView2ControllerAsync(new IntPtr(0));
-
-                
-
-
+            Thread thread = new Thread(() =>
+            {                
                 try
                 {
                     IsComplete = false;
 
                     var form = new WebViewFormHost(this);
-                    form.Left = 100000;
-                    form.Top = 100000;
+                 
+                    form.Left = 100_000;
+                    form.Top = 100_000;
                     form.PrintFromUrl(url, outputFile);
                     form.ShowDialog();
+
+                    form.Close();  // ensure form closes 
 
                     result = new PdfPrintResult()
                     {
@@ -90,7 +86,8 @@ namespace WestWind.HtmlToPdf
                         Message = form.IsSuccess ? "PDF was generated." : "PDF generation failed: " + form.LastException.Message,
                         LastException = form.LastException
                     };
-
+                    
+                    
                     OnPrintCompleteAction?.Invoke(result);
                     IsComplete = true;
                 }
@@ -134,10 +131,11 @@ namespace WestWind.HtmlToPdf
                     IsComplete = false;
 
                     var form = new WebViewFormHost(this);
-                    form.Left = 100000;
-                    form.Top = 100000;
+                    form.Left = 100_000;
+                    form.Top = 100_000;
                     form.PrintFromUrlStream(url);
                     form.ShowDialog();
+                    form.Close();  // ensure form closes 
 
                     result = new PdfPrintResult()
                     {
@@ -199,6 +197,7 @@ namespace WestWind.HtmlToPdf
                     form.Width = 1;
                     form.PrintFromUrl(url, outputFile);
                     form.ShowDialog();
+                    form.Close();  // ensure form closes 
 
                     result = new PdfPrintResult()
                     {
@@ -264,6 +263,7 @@ namespace WestWind.HtmlToPdf
                     form.Height = 1;
                     form.PrintFromUrlStream(url);
                     form.ShowDialog();
+                    form.Close();  // ensure form closes 
 
                     result = new PdfPrintResult()
                     {

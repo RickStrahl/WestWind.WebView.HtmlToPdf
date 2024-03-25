@@ -1,4 +1,4 @@
-﻿namespace WestWind.HtmlToPdf
+﻿namespace Westwind.WebView.HtmlToPdf
 {
     partial class WebViewFormHost
     {
@@ -40,7 +40,7 @@
             WebView.Dock = System.Windows.Forms.DockStyle.Fill;
             WebView.Location = new System.Drawing.Point(0, 0);
             WebView.Name = "WebView";
-            WebView.Size = new System.Drawing.Size(854, 566);
+            WebView.Size = new System.Drawing.Size(152, 80);
             WebView.TabIndex = 0;
             WebView.ZoomFactor = 1D;
             // 
@@ -48,7 +48,7 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(854, 566);
+            ClientSize = new System.Drawing.Size(152, 80);
             Controls.Add(WebView);
             Name = "WebViewFormHost";
             StartPosition = System.Windows.Forms.FormStartPosition.Manual;

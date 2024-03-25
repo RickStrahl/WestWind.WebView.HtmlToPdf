@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace WestWind.HtmlToPdf;
+﻿namespace Westwind.WebView.HtmlToPdf;
 
 /// <summary>
 /// Result from a Print to PDF operation. ResultStream is set only

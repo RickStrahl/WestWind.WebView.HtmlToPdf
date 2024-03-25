@@ -1,9 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <TargetFramework>net8.0-windows</TargetFramework> 
+    <UseWindowsForms>True</UseWindowsForms>
+	<UseWPF>true</UseWPF>
   </PropertyGroup>
+
+<PropertyGroup>
+	<DebugType>embedded</DebugType>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<PackageOutputPath>./nupkg</PackageOutputPath>
+
+	<PackageCopyright>Rick Strahl, West Wind Technologies 2024</PackageCopyright>
+	<PackageTags>Westwind Pdf Html WebView</PackageTags>
+	<PackageProjectUrl>https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore</RepositoryUrl>
+	<RepositoryType>Github</RepositoryType>
+
+	<PackageIcon>icon.png</PackageIcon>
+	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+</PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2365.46" />
+  </ItemGroup>
 
 </Project>

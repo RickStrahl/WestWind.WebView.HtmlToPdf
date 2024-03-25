@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WestWind.HtmlToPdf", "WestWind.HtmlToPdf\WestWind.HtmlToPdf.csproj", "{225554B9-0288-4DC8-AE73-1F4334E2B00C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Westwind.WebView.HtmlToPdf", "WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj", "{225554B9-0288-4DC8-AE73-1F4334E2B00C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Westwind.HtmlToPdf.Test", "Westwind.HtmlToPdf.Test\Westwind.HtmlToPdf.Test.csproj", "{413ED39E-1965-40D7-88B0-CA5DF91FDF89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Westwind.WebView.HtmlToPdf", "Westwind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj", "{131D4777-761C-42E8-A36F-AAE6661EDCF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "..\WestWind.PdfToHtml.ConsoleTest\ConsoleApp1\ConsoleApp1.csproj", "{A99DB5D0-033E-4221-8C38-5331DD439486}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Support", "Support", "{AD40CB9C-37A2-497A-AB59-E0D634A2FF20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,13 +25,17 @@ Global
 		{413ED39E-1965-40D7-88B0-CA5DF91FDF89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{413ED39E-1965-40D7-88B0-CA5DF91FDF89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{413ED39E-1965-40D7-88B0-CA5DF91FDF89}.Release|Any CPU.Build.0 = Release|Any CPU
-		{131D4777-761C-42E8-A36F-AAE6661EDCF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{131D4777-761C-42E8-A36F-AAE6661EDCF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{131D4777-761C-42E8-A36F-AAE6661EDCF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{131D4777-761C-42E8-A36F-AAE6661EDCF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A99DB5D0-033E-4221-8C38-5331DD439486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A99DB5D0-033E-4221-8C38-5331DD439486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A99DB5D0-033E-4221-8C38-5331DD439486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A99DB5D0-033E-4221-8C38-5331DD439486}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{413ED39E-1965-40D7-88B0-CA5DF91FDF89} = {AD40CB9C-37A2-497A-AB59-E0D634A2FF20}
+		{A99DB5D0-033E-4221-8C38-5331DD439486} = {AD40CB9C-37A2-497A-AB59-E0D634A2FF20}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B163354-AB5A-4370-82F7-E719157ED695}
