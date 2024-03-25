@@ -15,12 +15,15 @@ This library provides a quick way to print HTML to PDF on Windows using the WebV
 The components requires:
 
 * Running on Windows 11/10 Server 2019/2022
+* App that targets `net8.0-windows` or `net6.0-windows`
 * Running with an Interactive User Context 
+   * Desktop Applications
+   * Console Applications
 
 The component does not support:
 
 * Non Windows platforms
-* Running inside of a server, non-user context (ie. SYSTEM)
+* Running inside of a server, non-logged-on user context (ie. SYSTEM)
 
 ## Using the library
 
