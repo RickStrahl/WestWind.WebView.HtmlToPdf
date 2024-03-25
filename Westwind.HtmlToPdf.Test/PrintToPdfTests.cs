@@ -9,7 +9,6 @@ namespace Westwind.PdfToHtml.Test
     [TestClass]
     public class PrintToPdfTests
     {
-
         /// <summary>
         /// Event callback on completion - to file
         /// </summary>

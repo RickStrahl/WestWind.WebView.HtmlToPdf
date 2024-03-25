@@ -1,6 +1,5 @@
 # Html to PDF using WebView on Windows
 
-
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/westwind.webview.htmltopdf.svg)](https://www.nuget.org/packages?q=Westwind.webview.htmltopdf)
 
 This library provides a quick way to print HTML to PDF on Windows using the WebView control. You can generate PDF from HTML using a few different mechanisms:
@@ -11,7 +10,7 @@ This library provides a quick way to print HTML to PDF on Windows using the WebV
 * Using Event Callbacks
 
 ## Prerequisites
-The components supports:
+The components requires:
 
 * Running on Windows
 * Running with an Interactive User Context 
@@ -22,6 +21,7 @@ The component does not support:
 * Running inside of a server, non-user context (ie. SYSTEM)
 
 ## Using the library
+
 You can install the library from NuGet:
 
 ```ps

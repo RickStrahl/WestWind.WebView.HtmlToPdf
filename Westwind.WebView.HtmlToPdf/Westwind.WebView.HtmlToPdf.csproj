@@ -1,29 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework> 
-    <UseWindowsForms>True</UseWindowsForms>
-	<UseWPF>true</UseWPF>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Version>0.1</Version>
+		<TargetFramework>net8.0-windows</TargetFramework>		
+		<UseWindowsForms>True</UseWindowsForms>
 
-<PropertyGroup>
-	<DebugType>embedded</DebugType>
-	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	<PackageOutputPath>./nupkg</PackageOutputPath>
+		<Authors>Rick Strahl</Authors>
+		<Company>West Wind Technologies</Company>
+		<Product>West Wind WebView Html To PDF</Product>
+		<Title>Westwind WebView Html to Pdf</Title>
+		<Copyright>(c) West Wind Technologies, 2024</Copyright>
+	</PropertyGroup>
 
-	<PackageCopyright>Rick Strahl, West Wind Technologies 2024</PackageCopyright>
-	<PackageTags>Westwind Pdf Html WebView</PackageTags>
-	<PackageProjectUrl>https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/RickStrahl/Westwind.AspNetCore/tree/master/Westwind.AspNetCore</RepositoryUrl>
-	<RepositoryType>Github</RepositoryType>
+	<PropertyGroup>
+		<DebugType>embedded</DebugType>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageOutputPath>./nupkg</PackageOutputPath>
 
-	<PackageIcon>icon.png</PackageIcon>
-	<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
-</PropertyGroup>
+		<PackageCopyright>Rick Strahl, West Wind Technologies 2024</PackageCopyright>
+		<PackageTags>Westwind Pdf Html WebView</PackageTags>
+		<PackageProjectUrl>https://github.com/RickStrahl/Westwind.WebView.HtmlToPdf</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/RickStrahl/Westwind.WebView.HtmlToPdf</RepositoryUrl>
+		<RepositoryType>Github</RepositoryType>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2365.46" />
-  </ItemGroup>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2365.46" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<None Include="../icon.png" Pack="true" PackagePath="" />
+		<None Include="../LICENSE.md" Pack="true" PackagePath="" />
+		<None Include="../README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
 
 </Project>
