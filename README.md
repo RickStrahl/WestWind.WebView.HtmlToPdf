@@ -10,10 +10,11 @@ This library provides a quick way to print HTML to PDF on Windows using the WebV
 * Using Async Call
 * Using Event Callbacks
 
+## Prerequisites
 The components supports:
 
 * Running on Windows
-* Running in an Interactive User Context 
+* Running with an Interactive User Context 
 
 The component does not support:
 
