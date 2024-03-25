@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Westwind.WebView.HtmlToPdf"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Westwind.HtmlToPdf.Test", "Westwind.HtmlToPdf.Test\Westwind.HtmlToPdf.Test.csproj", "{413ED39E-1965-40D7-88B0-CA5DF91FDF89}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "..\WestWind.PdfToHtml.ConsoleTest\ConsoleApp1\ConsoleApp1.csproj", "{A99DB5D0-033E-4221-8C38-5331DD439486}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{A99DB5D0-033E-4221-8C38-5331DD439486}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Support", "Support", "{AD40CB9C-37A2-497A-AB59-E0D634A2FF20}"
 EndProject
