@@ -9,10 +9,10 @@ This library provides a quick way to print HTML to PDF on Windows using the WebV
 * Using Async Call
 * Using Event Callbacks
 
-> Using the WebView control has advantages in that it doesn't require any runtimes to be distributed since the WebView runtime is now part of Windows 11 and Windows 10 and updated automatically with Windows update.
+This library uses the built-in **WebView2 Runtime in Windows so it has no external dependencies for your applications** assuming you are running on a recent version of Windows that has the WebView2 Runtime installed.
 
 ## Prerequisites
-BBBBB The components requires:
+The components requires:
 
 * Running on Windows 11/10 Server 2019/2022
 * App that targets `net8.0-windows` or `net6.0-windows`
