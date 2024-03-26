@@ -182,14 +182,5 @@ host.PrintToPdfStream(htmlFile, pdfPrintSettings);
 // make sure app keeps running
 ```
 
-This should all be pretty straight forward. The `Task` based methods are easiest to use so that's the recommended syntax. The event based methods are there so you can more easily use this if you are not running in some sort of async environment already. Both approaches run on a separate STA thread to ensure that the WebView can run regardless of whether you are running inside of an application that has a main UI/STA thread.
+The `Task` based methods are easiest to use so that's the recommended syntax. The event based methods are there so you can more easily use this if you are not running in some sort of async environment already. Both approaches run on a separate STA thread to ensure that the WebView can run regardless of whether you are running inside of an application that has a main UI/STA thread.
 
-## The Good the Bad and the Ugly
-This component works well in the environments that it can run in, which is in any desktop login scenario. As mentioned it's a major bummer that it doesn't work in a non-desktop environment.
-
-To see how this fails, you can run the Console sample that ships in the Github repository and try running it under the `SYSTEM` account (you can [PsExec](https://learn.microsoft.com/en-us/sysinternals/downloads/psexec) for that)
-
-```ps
-cd <buildOutputFolder>
-psExec -i -s .\ConsoleApp1.exe
-```
