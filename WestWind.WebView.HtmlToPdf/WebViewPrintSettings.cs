@@ -22,6 +22,21 @@ public class WebViewPrintSettings
         }
     }
 
+    /// <summary>
+    /// Portrait, Landscape
+    /// </summary>
+    public WebViewPrintOrientations Orientation { get; set; } = WebViewPrintOrientations.Portrait;
+
+    /// <summary>
+    /// Width in inches
+    /// </summary>
+    public float PageWidth { get; set; } = 8.5F;
+
+    /// <summary>
+    /// Height in inches
+    /// </summary>
+    public float PageHeight { get; set; } = 11F;
+
 
     /// <summary>
     /// Top Margin in inches
@@ -43,21 +58,6 @@ public class WebViewPrintSettings
     /// </summary>
     public float MarginRight { get; set; } = 0.20F;
 
-    /// <summary>
-    /// Width in inches
-    /// </summary>
-    public float PageWidth { get; set; } = 8.5F;
-
-    /// <summary>
-    /// Height in inches
-    /// </summary>
-    public float PageHeight { get; set; } = 11F;
-
-
-    /// <summary>
-    /// Number of Copies to print
-    /// </summary>
-    public int Copies { get; set; } = 1;
 
 
     /// <summary>
@@ -67,24 +67,18 @@ public class WebViewPrintSettings
 
 
     /// <summary>
-    /// Default, OneSided, TwoSidedLongEdge, TwoSidedShortEdge
+    /// Determines whether background colors are printed. Use to
+    /// save ink on printing or for more legible in print/pdf scenarios
     /// </summary>
-    public WebViewPrintDuplexes Duplex { get; set; } = WebViewPrintDuplexes.Default;
+    public bool ShouldPrintBackgrounds { get; set; } = true;
 
-    /// <summary>
-    /// Default, Collated, Uncollated
-    /// </summary>
-    public WebViewPrintCollations Collation { get; set; } = WebViewPrintCollations.Default;
 
     /// <summary>
     /// Color, Grayscale, Monochrome
+    /// 
+    /// CURRENTLY DOESN'T WORK FOR PDF GENERATION
     /// </summary>
     public WebViewPrintColorModes ColorMode { get; set; } = WebViewPrintColorModes.Color;
-
-    /// <summary>
-    /// Portrait, Landscape
-    /// </summary>
-    public WebViewPrintOrientations Orientation { get; set;  } = WebViewPrintOrientations.Portrait;
 
 
     /// <summary>
@@ -108,22 +102,44 @@ public class WebViewPrintSettings
     public string FooterUri { get; set; }
 
 
-    /// <summary>
-    /// Determines whether background colors are printed. Use to
-    /// save ink on printing or for more legible in print/pdf scenarios
-    /// </summary>
-    public bool ShouldPrintBackgrounds { get; set; } = true;
 
-    
+
+    #region Print Settings - ignored for PDF
+
     /// <summary>
     /// Printer name when printing to a printer (not applicable for PDF)
+    /// 
+    /// NO EFFECT ON PDF PRINTING
     /// </summary>
     public string PrinterName { get; set; }
 
     /// <summary>
+    /// Number of Copies to print
+    /// 
+    /// NO EFFECT ON PDF PRINTING
+    /// </summary>
+    public int Copies { get; set; } = 1;
+
+    /// <summary>
+    /// Default, OneSided, TwoSidedLongEdge, TwoSidedShortEdge
+    /// 
+    /// NO EFFECT ON PDF PRINTING
+    /// </summary>
+    public WebViewPrintDuplexes Duplex { get; set; } = WebViewPrintDuplexes.Default;
+
+    /// <summary>
+    /// Default, Collated, Uncollated
+    /// 
+    /// NO EFFECT OF PDF PRINTING
+    /// </summary>
+    public WebViewPrintCollations Collation { get; set; } = WebViewPrintCollations.Default;
+
+    /// <summary>
     /// Allows multiple pages to be packed into a single page.
+    /// 
+    /// NO EFFECT ON PDF PRINTING
     /// </summary>
     public int PagesPerSide { get; set; } = 1;
 
-
+    #endregion
 }

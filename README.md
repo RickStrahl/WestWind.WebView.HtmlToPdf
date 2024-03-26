@@ -1,6 +1,6 @@
 # Html to PDF using WebView on Windows
 
-[![NuGet Pre Release](https://img.shields.io/nuget/vpre/westwind.webview.htmltopdf.svg)](https://www.nuget.org/packages?q=Westwind.webview.htmltopdf)
+<a href="https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/">![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.svg)</a> ![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.svg) 
 
 This library provides a quick way to print HTML to PDF on Windows using the WebView control. You can generate PDF from HTML using a few different mechanisms:
 
@@ -51,7 +51,6 @@ All of the methods take a file or Url as input. File names have to be fully qual
 All requests return a `PdfPrintResult` structure which has a `IsSuccess` flag you can check. For stream results, the `ResultStream` property will be set with a `MemoryStream` instance on success. Errors can use the `Message` or `LastException` to retrieve error information.
 
 
-
 ### Async Call Syntax for File Output
 
 ```csharp
@@ -77,6 +76,12 @@ File.Delete(outputFile);
 var host = new HtmlToPdfHost();
 var pdfPrintSettings = new WebViewPrintSettings()
 {                
+    // default margins are 0.4F
+    MarginBottom = 0.2F,
+    MarginLeft = 0.2f,
+    MarginRight = 0.2f,
+    MarginTop = 0.4f,
+    ScaleFactor = 0.8F 
     ShouldPrintHeaderAndFooter = true,
     HeaderTitle = "Blog Post Title"
 };
@@ -175,4 +180,16 @@ var pdfPrintSettings = new WebViewPrintSettings()
 host.PrintToPdfStream(htmlFile, pdfPrintSettings);
 
 // make sure app keeps running
+```
+
+This should all be pretty straight forward. The `Task` based methods are easiest to use so that's the recommended syntax. The event based methods are there so you can more easily use this if you are not running in some sort of async environment already. Both approaches run on a separate STA thread to ensure that the WebView can run regardless of whether you are running inside of an application that has a main UI/STA thread.
+
+## The Good the Bad and the Ugly
+This component works well in the environments that it can run in, which is in any desktop login scenario. As mentioned it's a major bummer that it doesn't work in a non-desktop environment.
+
+To see how this fails, you can run the Console sample that ships in the Github repository and try running it under the `SYSTEM` account (you can [PsExec](https://learn.microsoft.com/en-us/sysinternals/downloads/psexec) for that)
+
+```ps
+cd <buildOutputFolder>
+psExec -i -s .\ConsoleApp1.exe
 ```
