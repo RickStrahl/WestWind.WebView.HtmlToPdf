@@ -50,50 +50,46 @@ All of the methods take a file or Url as input. File names have to be fully qual
 
 All requests return a `PdfPrintResult` structure which has a `IsSuccess` flag you can check. For stream results, the `ResultStream` property will be set with a `MemoryStream` instance on success. Errors can use the `Message` or `LastException` to retrieve error information.
 
+
+
 ### Async Call Syntax for File Output
 
 ```csharp
-// File or URL
-var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
-
-// Full Path to output file
-var outputFile = Path.GetFullPath(@".\test.pdf");
+// Url or full qualified file path
+var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+var outputFile = Path.GetFullPath(@".\test2.pdf");
 File.Delete(outputFile);
 
-var host = new HtmlToPdfHost();            
-host.OnPrintCompleteAction = (result) =>
-{
-    if (result.IsSuccess)
-    {
-        ShellUtils.OpenUrl(outputFile);
-        Assert.IsTrue(true);
-    }
-    else
-    {
-        Assert.Fail(result.Message);  // also result.LastException
-    }
-};
-host.PrintToPdf(htmlFile, outputFile);
+var host = new HtmlToPdfHost();
+var result = await host.PrintToPdfAsync(htmlFile, outputFile);
+
+Assert.IsTrue(result.IsSuccess, result.Message);
+ShellUtils.OpenUrl(outputFile);  // display the PDF file
 ```
 
 ### Async Call Syntax for Stream Result
 
-```csharp
+```cs
 var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
 var outputFile = Path.GetFullPath(@".\test3.pdf");
 File.Delete(outputFile);
 
 var host = new HtmlToPdfHost();
+var pdfPrintSettings = new WebViewPrintSettings()
+{                
+    ShouldPrintHeaderAndFooter = true,
+    HeaderTitle = "Blog Post Title"
+};
 
 // We're interested in result.ResultStream
-var result = await host.PrintToPdfStreamAsync(htmlFile);
+var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);
 
 Assert.IsTrue(result.IsSuccess, result.Message);
-Assert.IsNotNull(result.ResultStream); // MemoryStream instance
+Assert.IsNotNull(result.ResultStream); // This is what we're after
 
 Debug.WriteLine($"Stream Length: {result.ResultStream.Length}");
 
-// Copy resultstream to output file and display
+// Copy resultstream to output file so we can display it
 File.Delete(outputFile);
 using var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write);
 result.ResultStream.CopyTo(fstream);
@@ -132,9 +128,11 @@ var pdfPrintSettings = new WebViewPrintSettings()
     MarginRight = 0.2f,
     MarginTop = 0.4f,
     ScaleFactor = 0.8f,
-    PageRanges = "3-6"
+    PageRanges = "1,2,5-7"
 };
 host.PrintToPdf(htmlFile, outputFile, pdfPrintSettings);
+
+// make sure app keeps running
 ```
 
 ### Event Syntax to Stream
@@ -175,4 +173,6 @@ var pdfPrintSettings = new WebViewPrintSettings()
     ScaleFactor = 0.8f,
 };
 host.PrintToPdfStream(htmlFile, pdfPrintSettings);
+
+// make sure app keeps running
 ```

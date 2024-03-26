@@ -18,12 +18,12 @@ namespace Westwind.PdfToHtml.Test
         /// </remarks>
         [TestMethod]
         public async Task PrintToPdfFileTest()
-        {
-            var outputFile = Path.GetFullPath(@".\test.pdf");
-
+        {        
             // File or URL
             var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
 
+            // Full Path to output file
+            var outputFile = Path.GetFullPath(@".\test.pdf");
             File.Delete(outputFile);
 
             var host = new HtmlToPdfHost();            
