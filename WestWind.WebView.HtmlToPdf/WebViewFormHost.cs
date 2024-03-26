@@ -145,23 +145,29 @@ namespace Westwind.WebView.HtmlToPdf
             wvps.PageHeight = ps.PageHeight;
 
             wvps.Copies = ps.Copies;
-
-            wvps.HeaderTitle = ps.HeaderTitle;
-            wvps.ShouldPrintHeaderAndFooter = ps.ShouldPrintHeaderandFooter;
-            wvps.ShouldPrintBackgrounds = ps.ShouldPrintBackgrounds;
-            wvps.FooterUri = ps.FooterUri;
-            
-            wvps.PagesPerSide = ps.PagesPerSide;
-            wvps.ShouldPrintSelectionOnly = ps.ShouldPrintSelectionOnly;
-            wvps.Orientation = ps.Orientation == "Portrait" ? CoreWebView2PrintOrientation.Portrait : CoreWebView2PrintOrientation.Landscape;
-            wvps.Duplex = ps.Duplex == "Default" ? CoreWebView2PrintDuplex.Default : 
-                ps.Duplex == "OneSided" ? CoreWebView2PrintDuplex.OneSided : 
-                ps.Duplex == "TwoSidedLongEdge" ? CoreWebView2PrintDuplex.TwoSidedLongEdge : 
-                CoreWebView2PrintDuplex.TwoSidedShortEdge;
-            wvps.ColorMode = ps.ColorMode == "Color" ? CoreWebView2PrintColorMode.Color : CoreWebView2PrintColorMode.Grayscale;
             wvps.PageRanges = ps.PageRanges;
+
+            wvps.ShouldPrintBackgrounds = ps.ShouldPrintBackgrounds;
+
+            wvps.ShouldPrintHeaderAndFooter = ps.ShouldPrintHeaderAndFooter;
+            wvps.HeaderTitle = ps.HeaderTitle;
+            wvps.FooterUri = ps.FooterUri;
+                        
+            wvps.ShouldPrintSelectionOnly = ps.ShouldPrintSelectionOnly;
+            wvps.Orientation = ps.Orientation == WebViewPrintOrientations.Portrait ? CoreWebView2PrintOrientation.Portrait : CoreWebView2PrintOrientation.Landscape;
+            wvps.Duplex = ps.Duplex == WebViewPrintDuplexes.Default ? CoreWebView2PrintDuplex.Default : 
+                ps.Duplex == WebViewPrintDuplexes.OneSided ? CoreWebView2PrintDuplex.OneSided : 
+                ps.Duplex == WebViewPrintDuplexes.TwoSidedLongEdge ? CoreWebView2PrintDuplex.TwoSidedLongEdge : 
+                CoreWebView2PrintDuplex.TwoSidedShortEdge;
+            wvps.Collation = ps.Collation == WebViewPrintCollations.Default ? CoreWebView2PrintCollation.Default :
+                    ps.Collation == WebViewPrintCollations.Collated ? CoreWebView2PrintCollation.Collated :
+                    CoreWebView2PrintCollation.Uncollated;
+            wvps.ColorMode = ps.ColorMode == WebViewPrintColorModes.Color ? CoreWebView2PrintColorMode.Color : CoreWebView2PrintColorMode.Grayscale;
+            
+            
             wvps.PrinterName = ps.PrinterName;
-                
+            wvps.PagesPerSide = ps.PagesPerSide;
+
             return wvps;
         }
 

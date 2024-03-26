@@ -12,7 +12,7 @@ This library provides a quick way to print HTML to PDF on Windows using the WebV
 > Using the WebView control has advantages in that it doesn't require any runtimes to be distributed since the WebView runtime is now part of Windows 11 and Windows 10 and updated automatically with Windows update.
 
 ## Prerequisites
-The components requires:
+BBBBB The components requires:
 
 * Running on Windows 11/10 Server 2019/2022
 * App that targets `net8.0-windows` or `net6.0-windows`
@@ -58,7 +58,7 @@ var pdfPrintSettings = new WebViewPrintSettings()
     MarginTop = 0.4f,
     ScaleFactor = 0.8F,
     ShouldPrintHeaderandFooter = false,
-    ColorMode = "Color",
+    ColorMode = WebViewPrintColorModes.Grayscale,
 };
 var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
 
@@ -83,7 +83,7 @@ var pdfPrintSettings = new WebViewPrintSettings()
     ScaleFactor = 1,
     HeaderTitle = "Markdown Monster",
     ShouldPrintHeaderandFooter = true,
-    ColorMode = "Grayscale",  // doesn't work
+    ColorMode = WebViewPrintColorModes.Grayscale,
     FooterUri = "https://west-wind.com"
 };
 

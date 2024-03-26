@@ -41,14 +41,19 @@ namespace Westwind.PdfToHtml.Test
             };
             var pdfPrintSettings = new WebViewPrintSettings()
             {
+                // All margins default 0.4F
                 MarginBottom = 0.2F,
                 MarginLeft = 0.2f,
                 MarginRight = 0.2f,
-                MarginTop = 0.4f,
+                MarginTop = 0.4f, 
+
                 ScaleFactor = 0.8f,
-                ColorMode = "Grayscale",    // this doesn't work: https://github.com/MicrosoftEdge/WebView2Feedback/issues/4445
-                ShouldPrintBackgrounds = false,
-                ShouldPrintHeaderandFooter = false,
+                ColorMode = WebViewPrintColorModes.Grayscale,    // this doesn't work: https://github.com/MicrosoftEdge/WebView2Feedback/issues/4445
+                ShouldPrintBackgrounds = true,
+                ShouldPrintHeaderAndFooter = true,                
+                HeaderTitle = "Blog Post",
+                FooterUri = "https://west-wind.com"
+                //PageRanges = "3-5"
             };
             host.PrintToPdf(htmlFile, outputFile, pdfPrintSettings);
 
@@ -107,9 +112,9 @@ namespace Westwind.PdfToHtml.Test
                 MarginRight = 0.2f,
                 MarginTop = 0.4f,
                 ScaleFactor = 0.8f,
-                ColorMode = "Grayscale",    // this doesn't work: https://github.com/MicrosoftEdge/WebView2Feedback/issues/4445
+                ColorMode = WebViewPrintColorModes.Grayscale,    // this doesn't work: https://github.com/MicrosoftEdge/WebView2Feedback/issues/4445
                 ShouldPrintBackgrounds = false,
-                ShouldPrintHeaderandFooter = false,
+                ShouldPrintHeaderAndFooter = false,
             };
             host.PrintToPdfStream(htmlFile, pdfPrintSettings);
 
@@ -145,8 +150,8 @@ namespace Westwind.PdfToHtml.Test
                 MarginRight = 0.2f,
                 MarginTop = 0.4f,
                 ScaleFactor = 0.8F,
-                ShouldPrintHeaderandFooter = false,
-                ColorMode = "Grayscale",  // this doesn't work   
+                ShouldPrintHeaderAndFooter = false,
+                ColorMode = WebViewPrintColorModes.Grayscale,  // this doesn't work   
                 FooterUri = "https://west-wind.com"
             };
             var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
@@ -177,8 +182,8 @@ namespace Westwind.PdfToHtml.Test
                 MarginRight = 0.2f,
                 MarginTop = 0.4f,
                 ScaleFactor = 1,
-                ShouldPrintHeaderandFooter = false,
-                ColorMode = "Grayscale",
+                ShouldPrintHeaderAndFooter = false,
+                ColorMode = WebViewPrintColorModes.Grayscale,
                 FooterUri = "https://west-wind.com"
             };
 
