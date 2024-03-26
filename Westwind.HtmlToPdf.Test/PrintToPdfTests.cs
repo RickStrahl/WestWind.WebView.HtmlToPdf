@@ -39,23 +39,7 @@ namespace Westwind.PdfToHtml.Test
                     Assert.Fail(result.Message);
                 }
             };
-            var pdfPrintSettings = new WebViewPrintSettings()
-            {
-                // All margins default 0.4F
-                MarginBottom = 0.2F,
-                MarginLeft = 0.2f,
-                MarginRight = 0.2f,
-                MarginTop = 0.4f, 
-
-                ScaleFactor = 0.8f,
-                ColorMode = WebViewPrintColorModes.Grayscale,    // this doesn't work: https://github.com/MicrosoftEdge/WebView2Feedback/issues/4445
-                ShouldPrintBackgrounds = true,
-                ShouldPrintHeaderAndFooter = true,                
-                HeaderTitle = "Blog Post",
-                FooterUri = "https://west-wind.com"
-                //PageRanges = "3-5"
-            };
-            host.PrintToPdf(htmlFile, outputFile, pdfPrintSettings);
+            host.PrintToPdf(htmlFile, outputFile);
 
             // have to wait for completion of event callback
             for (int i = 0; i < 50; i++)
@@ -107,14 +91,13 @@ namespace Westwind.PdfToHtml.Test
             };
             var pdfPrintSettings = new WebViewPrintSettings()
             {
+                // default margins are 0.4F
                 MarginBottom = 0.2F,
                 MarginLeft = 0.2f,
                 MarginRight = 0.2f,
                 MarginTop = 0.4f,
                 ScaleFactor = 0.8f,
-                ColorMode = WebViewPrintColorModes.Grayscale,    // this doesn't work: https://github.com/MicrosoftEdge/WebView2Feedback/issues/4445
-                ShouldPrintBackgrounds = false,
-                ShouldPrintHeaderAndFooter = false,
+                PageRanges = "1,2,5-8"
             };
             host.PrintToPdfStream(htmlFile, pdfPrintSettings);
 
@@ -143,16 +126,13 @@ namespace Westwind.PdfToHtml.Test
 
             var host = new HtmlToPdfHost();
             var pdfPrintSettings = new WebViewPrintSettings()
-            {
-                HeaderTitle = "Markdown Monster",
+            {                
                 MarginBottom = 0.2F,
                 MarginLeft = 0.2f,
                 MarginRight = 0.2f,
                 MarginTop = 0.4f,
-                ScaleFactor = 0.8F,
-                ShouldPrintHeaderAndFooter = false,
-                ColorMode = WebViewPrintColorModes.Grayscale,  // this doesn't work   
-                FooterUri = "https://west-wind.com"
+                ScaleFactor = 0.8F,                
+                ColorMode = WebViewPrintColorModes.Grayscale,  // this doesn't work (WV bug)                  
             };
             var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
 
@@ -175,16 +155,10 @@ namespace Westwind.PdfToHtml.Test
 
             var host = new HtmlToPdfHost();
             var pdfPrintSettings = new WebViewPrintSettings()
-            {
-                HeaderTitle = "Markdown Monster",
-                MarginBottom = 0.2F,
-                MarginLeft = 0.2f,
-                MarginRight = 0.2f,
-                MarginTop = 0.4f,
-                ScaleFactor = 1,
-                ShouldPrintHeaderAndFooter = false,
-                ColorMode = WebViewPrintColorModes.Grayscale,
-                FooterUri = "https://west-wind.com"
+            {                
+                ShouldPrintHeaderAndFooter = true,
+                HeaderTitle = "Blog Post Title",
+                ColorMode = WebViewPrintColorModes.Grayscale,  // doesn't work                
             };
 
             // We're interested in result.ResultStream

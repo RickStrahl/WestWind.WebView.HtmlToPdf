@@ -39,31 +39,41 @@ or:
 dotnet add package westwind.webview.htmltopdf
 ```
 
+The library has 4 separate output methods:
+
+* PrintToPdf()  - Prints to file with a Callback
+* PrintToPdfStream() - Prints and returns a `result.ResultStream` in a Callback
+* PrintToPdfAsync() - Runs async to create a PDF file and waits for completion 
+* PrintToPdfStreamAsync() - Runs async and returns a `result.ResultStream`
+
+All of the methods take a file or Url as input. File names have to be fully qualified with a path. Output to file requires that you provide a filename.
+
+All requests return a `PdfPrintResult` structure which has a `IsSuccess` flag you can check. For stream results, the `ResultStream` property will be set with a `MemoryStream` instance on success. Errors can use the `Message` or `LastException` to retrieve error information.
+
 ### Async Call Syntax for File Output
 
 ```csharp
-// Full path to File or URL
-var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
-var outputFile = Path.GetFullPath(@".\test2.pdf");
+// File or URL
+var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
+
+// Full Path to output file
+var outputFile = Path.GetFullPath(@".\test.pdf");
 File.Delete(outputFile);
 
-var host = new HtmlToPdfHost();
-
-// all overrides are optional!
-var pdfPrintSettings = new WebViewPrintSettings()
+var host = new HtmlToPdfHost();            
+host.OnPrintCompleteAction = (result) =>
 {
-    MarginBottom = 0.2F,
-    MarginLeft = 0.2f,
-    MarginRight = 0.2f,
-    MarginTop = 0.4f,
-    ScaleFactor = 0.8F,
-    ShouldPrintHeaderandFooter = false,
-    ColorMode = WebViewPrintColorModes.Grayscale,
+    if (result.IsSuccess)
+    {
+        ShellUtils.OpenUrl(outputFile);
+        Assert.IsTrue(true);
+    }
+    else
+    {
+        Assert.Fail(result.Message);  // also result.LastException
+    }
 };
-var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
-
-Assert.IsTrue(result.IsSuccess, result.Message);
-ShellUtils.OpenUrl(outputFile);
+host.PrintToPdf(htmlFile, outputFile);
 ```
 
 ### Async Call Syntax for Stream Result
@@ -74,21 +84,9 @@ var outputFile = Path.GetFullPath(@".\test3.pdf");
 File.Delete(outputFile);
 
 var host = new HtmlToPdfHost();
-var pdfPrintSettings = new WebViewPrintSettings()
-{
-    MarginBottom = 0.2F,
-    MarginLeft = 0.2f,
-    MarginRight = 0.2f,
-    MarginTop = 0.4f,
-    ScaleFactor = 1,
-    HeaderTitle = "Markdown Monster",
-    ShouldPrintHeaderandFooter = true,
-    ColorMode = WebViewPrintColorModes.Grayscale,
-    FooterUri = "https://west-wind.com"
-};
 
 // We're interested in result.ResultStream
-var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);
+var result = await host.PrintToPdfStreamAsync(htmlFile);
 
 Assert.IsTrue(result.IsSuccess, result.Message);
 Assert.IsNotNull(result.ResultStream); // MemoryStream instance
@@ -128,11 +126,13 @@ host.OnPrintCompleteAction = (result) =>
 };
 var pdfPrintSettings = new WebViewPrintSettings()
 {
+    // default margins are 0.4F
     MarginBottom = 0.2F,
     MarginLeft = 0.2f,
     MarginRight = 0.2f,
     MarginTop = 0.4f,
-    ScaleFactor = 0.8f
+    ScaleFactor = 0.8f,
+    PageRanges = "3-6"
 };
 host.PrintToPdf(htmlFile, outputFile, pdfPrintSettings);
 ```
