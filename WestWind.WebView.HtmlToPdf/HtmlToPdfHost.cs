@@ -4,9 +4,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Threading;
-using static System.Windows.Forms.DataFormats;
-
 
 namespace Westwind.WebView.HtmlToPdf
 {
@@ -75,40 +72,61 @@ namespace Westwind.WebView.HtmlToPdf
             };
 
             Thread thread = new Thread(() =>
-            {                
-                try
+            {
+                // Create a Windows Forms Synchronization Context we can execute
+                // which works without a desktop!
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                if (SynchronizationContext.Current == null)
                 {
-                    IsComplete = false;
-
-                    var form = new WebViewFormHost(this);
-                 
-                    form.Left = 100_000;
-                    form.Top = 100_000;
-                    form.PrintFromUrl(url, outputFile);
-                    form.ShowDialog();
-
-                    form.Close();  // ensure form closes 
-
-                    result = new PdfPrintResult()
-                    {
-                        IsSuccess = form.IsSuccess,
-                        Message = form.IsSuccess ? "PDF was generated." : "PDF generation failed: " + form.LastException.Message,
-                        LastException = form.LastException
-                    };
-                    
-                    
-                    OnPrintCompleteAction?.Invoke(result);
                     IsComplete = true;
+                    OnPrintCompleteAction?.Invoke(new PdfPrintResult { IsSuccess = false, Message = "Couldn't create STA Synchronization Context." });
+                    return;
                 }
-                catch (Exception ex)
+                SynchronizationContext.Current.Post(async (state) =>
                 {
-                    result.IsSuccess = false;
-                    result.LastException = ex;
-                    result.Message = ex.Message;
-                    OnPrintCompleteAction?.Invoke(result);
-                }
-            });
+                    try
+                    {
+                        IsComplete = false;
+                        var host = new CoreWebViewHeadlessHost(this);
+                        await host.PrintFromUrl(url, outputFile);
 
+                        await WaitForHostComplete(host);
+
+                        if (!host.IsComplete)
+                        {
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = false,
+                                Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
+                            };
+                        }
+                        else
+                        {
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = host.IsSuccess,
+                                Message = host.IsSuccess ? "PDF was generated." : "PDF generation failed: " + host.LastException?.Message,
+                                LastException = host.LastException
+                            };
+                        }
+
+                        OnPrintCompleteAction?.Invoke(result);                        
+                    }
+                    catch (Exception ex)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = ex.ToString();
+                        result.LastException = ex;                     
+                    }
+                    finally
+                    {
+                        IsComplete = true;
+                        Application.ExitThread();  // now kill the event loop and thread
+                    }
+                }, null);
+                Application.Run();  // Windows Event loop needed for WebView in system context!
+            });
+           
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();          
         }
@@ -135,35 +153,66 @@ namespace Westwind.WebView.HtmlToPdf
 
             Thread thread = new Thread(() =>
             {
-                try
+                // Create a Windows Forms Synchronization Context we can execute
+                // which works without a desktop!
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                if (SynchronizationContext.Current == null)
                 {
-                    IsComplete = false;
-
-                    var form = new WebViewFormHost(this);
-                    form.Left = 100_000;
-                    form.Top = 100_000;
-                    form.PrintFromUrlStream(url);
-                    form.ShowDialog();                    
-                    form.Close();  // ensure form closes 
-
-                    result = new PdfPrintResult()
-                    {
-                        IsSuccess = form.IsSuccess,
-                        ResultStream = form.ResultStream as MemoryStream,
-                        Message = form.IsSuccess ? "PDF was generated." : "PDF generation failed: " + form.LastException.Message,
-                        LastException = form.LastException
-                    };
-
-                    OnPrintCompleteAction?.Invoke(result);
                     IsComplete = true;
+                    OnPrintCompleteAction?.Invoke(new PdfPrintResult { IsSuccess = false, Message = "Couldn't create STA Synchronization Context." });
+                    return;
                 }
-                catch (Exception ex)
+                SynchronizationContext.Current.Post(async (state) =>
                 {
-                    result.IsSuccess = false;
-                    result.LastException = ex;
-                    result.Message = ex.Message;
-                    OnPrintCompleteAction?.Invoke(result);
-                }
+                    try
+                    {
+                        IsComplete = false;
+
+                        var host = new CoreWebViewHeadlessHost(this);
+                        await host.PrintFromUrlStream(url);
+
+                        for (int i = 0; i < RenderTimeoutMs / 20; i++)
+                        {
+                            if (host.IsComplete)
+                                break;
+                            await Task.Delay(20);
+                        }
+
+                        if (!host.IsComplete)
+                        {
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = false,
+                                Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
+                            };
+                        }
+                        else
+                        {
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = host.IsSuccess,
+                                Message = host.IsSuccess ? "PDF was generated." : "PDF generation failed: " + host.LastException?.Message,
+                                ResultStream = host.ResultStream,
+                                LastException = host.LastException
+                            };
+                        }
+
+                        OnPrintCompleteAction?.Invoke(result);
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = ex.ToString();
+                        result.LastException = ex;                        
+                    }
+                    finally
+                    {
+                        IsComplete = true;
+                        Application.ExitThread();  // now kill the event loop and thread
+                    }
+                }, null);
+                Application.Run();  // Windows Event loop needed for WebView in system context!
             });
 
             thread.SetApartmentState(ApartmentState.STA);
@@ -192,50 +241,61 @@ namespace Westwind.WebView.HtmlToPdf
             };
 
             var tcs = new TaskCompletionSource<PdfPrintResult>();
-
-            Thread thread = new Thread( () =>
+            Thread thread = new Thread(() =>
             {
-                try
+                // Create a Windows Forms Synchronization Context we can execute
+                // which works without a desktop!
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                if (SynchronizationContext.Current == null)
                 {
-                    IsComplete = false;
-
-                    var form = new WebViewFormHost(this);
-                    form.Left = 10;
-                    form.Top = 10;
-                    form.Height = 1;
-                    form.Width = 1;
-                    form.PrintFromUrl(url, outputFile);
-                    form.ShowDialog();
-
-                    if (!form.IsComplete)
+                    tcs.SetResult(new PdfPrintResult { IsSuccess = false, Message = "Couldn't create STA Synchronization Context." });
+                    return;
+                }
+                SynchronizationContext.Current.Post(async (state) =>
+                {
+                    try
                     {
-                        result = new PdfPrintResult()
+                        IsComplete = false;
+                        var host = new CoreWebViewHeadlessHost(this);
+                        await host.PrintFromUrl(url, outputFile);
+
+                        await WaitForHostComplete(host);
+
+                        if (!host.IsComplete)
                         {
-                            IsSuccess = false,
-                            Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
-                        };
-                     }
-                    else {
-                        result = new PdfPrintResult()
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = false,
+                                Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
+                            };
+                        }
+                        else
                         {
-                            IsSuccess = form.IsSuccess,
-                            Message = form.IsSuccess ? "PDF was generated." : "PDF generation failed: " + form.LastException?.Message,
-                            LastException = form.LastException
-                        };
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = host.IsSuccess,
+                                Message = host.IsSuccess ? "PDF was generated." : "PDF generation failed: " + host.LastException?.Message,                                
+                                LastException = host.LastException
+                            };
+                        }
+
+                        OnPrintCompleteAction?.Invoke(result);
+                        tcs.SetResult(result);
                     }
-
-                    IsComplete = true;
-                    OnPrintCompleteAction?.Invoke(result);
-                    tcs.SetResult(result);                    
-                }
-                catch (Exception ex)
-                {
-                    result.IsSuccess = false;
-                    result.Message = ex.ToString();
-                    result.LastException = ex;
-
-                    tcs.SetResult(result);
-                }
+                    catch (Exception ex)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = ex.ToString();
+                        result.LastException = ex;
+                        tcs.SetResult(result);
+                    }
+                    finally
+                    {
+                        IsComplete = true;
+                        Application.ExitThread();  // now kill the event loop and thread
+                    }
+                }, null);
+                Application.Run();  // Windows Event loop needed for WebView in system context!
             });
 
             thread.SetApartmentState(ApartmentState.STA); // MUST BE STA!
@@ -253,9 +313,9 @@ namespace Westwind.WebView.HtmlToPdf
         /// Check result.IsSuccess to check for successful completion.
         /// </summary>
         /// <param name="url">File or URL to print to PDF</param>        
-        /// <param name="webViewPrintSettings">WebView PDF generation settings</param>
-        public Task<PdfPrintResult> PrintToPdfStreamAsync(string url,            
-            WebViewPrintSettings webViewPrintSettings = null)
+        /// <param name="webViewPrintSettings">WebView PDF generation settings</param>       
+        public Task<PdfPrintResult> PrintToPdfStreamAsync(string url,
+           WebViewPrintSettings webViewPrintSettings = null)
         {
             IsComplete = false;
             WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
@@ -270,82 +330,24 @@ namespace Westwind.WebView.HtmlToPdf
 
             Thread thread = new Thread( () =>
             {
-                try
-                {
-                    IsComplete = false;
-
-                    var form = new WebViewFormHost(this);
-                    form.Left = 100_000;
-                    form.Top = 100_000;
-                    form.Width = 1;
-                    form.Height = 1;
-                    form.PrintFromUrlStream(url);
-                    form.ShowDialog();
-                   
-                    form.Close();  // ensure form closes 
-
-                    result = new PdfPrintResult()
-                    {
-                        IsSuccess = form.IsSuccess,
-                        ResultStream = form.ResultStream,
-                        Message = form.IsSuccess ? "PDF was generated." : "PDF generation failed: " + form.LastException?.Message,
-                        LastException = form.LastException
-                    };
-
-                    IsComplete = true;
-                    OnPrintCompleteAction?.Invoke(result);
-                    tcs.SetResult(result);
+                // Create a Windows Forms Synchronization Context we can execute
+                // which works without a desktop!
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                if (SynchronizationContext.Current == null)
+                { 
+                    tcs.SetResult(new PdfPrintResult {  IsSuccess = false, Message = "Couldn't create STA Synchronization Context." });
+                    return;
                 }
-                catch(Exception ex)
-                {
-                    result.IsSuccess = false;
-                    result.LastException = ex;
-                    result.Message = ex.Message;
-
-                    tcs.SetResult(result);
-                }
-            });
-
-            thread.SetApartmentState(ApartmentState.STA); // MUST BE STA!
-            thread.Start();
-
-            return tcs.Task;
-        }
-
-
-         public Task<PdfPrintResult> PrintToPdfStreamExAsync(string url,             
-            WebViewPrintSettings webViewPrintSettings = null)
-        {
-            IsComplete = false;
-            WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
-
-            PdfPrintResult result = new() { 
-                IsSuccess = false,
-                Message = "PDF generation didn't complete.",
-            };
-
-            var tcs = new TaskCompletionSource<PdfPrintResult>();
-
-            Thread thread = new Thread( async () =>
-            {
-                _ = Dispatcher.CurrentDispatcher.Invoke(async () =>
+                SynchronizationContext.Current.Post( async (state)=>                 
                 {
                     try
                     {
                         IsComplete = false;
+                        var host = new CoreWebViewHeadlessHost(this);
+                        await host.PrintFromUrlStream(url);
 
-                        var host = new CoreWebViewHeadlessHost(this, url);
+                        await WaitForHostComplete(host);                        
 
-                        await Task.Delay(420);
-
-                        host.PrintFromUrlStream(url);
-
-                        for (int i = 0; i < 200; i++)
-                        {
-                            if (host.IsComplete)
-                                break;
-                            await Task.Delay(50);
-                        }
                         if (!host.IsComplete)
                         {
                             result = new PdfPrintResult()
@@ -365,7 +367,6 @@ namespace Westwind.WebView.HtmlToPdf
                             };
                         }
 
-                        IsComplete = true;
                         OnPrintCompleteAction?.Invoke(result);
                         tcs.SetResult(result);
                     }
@@ -374,19 +375,31 @@ namespace Westwind.WebView.HtmlToPdf
                         result.IsSuccess = false;
                         result.Message = ex.ToString();
                         result.LastException = ex;
-
                         tcs.SetResult(result);
                     }
-
-                    Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.Send);
-                });
-                Dispatcher.Run();
+                    finally
+                    {
+                        IsComplete = true;
+                        Application.ExitThread();  // now kill the event loop and thread
+                    }
+                }, null);                
+                Application.Run();  // Windows Event loop needed for WebView in system context!
             });
 
             thread.SetApartmentState(ApartmentState.STA); // MUST BE STA!
             thread.Start();
 
-            return tcs.Task;            
+            return tcs.Task;
+        }
+
+        private async Task WaitForHostComplete(CoreWebViewHeadlessHost host)
+        {
+            for (int i = 0; i < RenderTimeoutMs / 20; i++)
+            {
+                if (host.IsComplete)
+                    break;
+                await Task.Delay(10);
+            }
         }
 
     }

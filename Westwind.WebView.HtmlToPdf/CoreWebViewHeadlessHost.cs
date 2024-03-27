@@ -1,55 +1,55 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Westwind.WebView.HtmlToPdf
 {
 
     /// <summary>
-    /// IMPORTANT: DOES NOT WORK but should according to WebView docs
-    /// https://github.com/MicrosoftEdge/WebView2Feedback/issues/202
-    /// 
-    /// 
-    /// This is Headless Host 
+    /// This class provides the invisible WebView instance used to
+    /// print the PDF. 
     /// </summary>
-    public class CoreWebViewHeadlessHost
+    internal class CoreWebViewHeadlessHost
     {
-        public WebViewPrintSettings WebViewPrintSettings { get; set; } = new WebViewPrintSettings();
+        /// <summary>
+        /// The internal print settings picked up from the passed in host
+        /// </summary>
+        internal WebViewPrintSettings WebViewPrintSettings { get; set; } = new WebViewPrintSettings();
 
         private string _outputFile { get; set; }
 
-        public HtmlToPdfHost HtmlToPdfHost { get; set; }
+        /// <summary>
+        /// Passed in high level host
+        /// </summary>
+        internal HtmlToPdfHost HtmlToPdfHost { get; set; }
 
-        public bool IsSuccess { get; set; } = false;
+        internal bool IsSuccess { get; set; } = false;
 
-        public Exception LastException { get; set; }
+        internal Exception LastException { get; set; }
 
-        public Stream ResultStream { get; set; }
+        internal Stream ResultStream { get; set; }
 
-        public bool IsComplete { get; set; }
+        /// <summary>
+        /// Determines when PDF output generation is complete
+        /// </summary>
+        internal bool IsComplete { get; set; }
 
+        /// <summary>
+        /// The internal WebView instance we load and print from
+        /// </summary>
         CoreWebView2 WebView { get; set; }
 
         private PdfPrintOutputModes PdfPrintOutputMode { get; set; } = PdfPrintOutputModes.File;
 
         private bool _IsInitialized = false;
 
-        public string UrlOrFile { get; set;  }
-        public CoreWebViewHeadlessHost(HtmlToPdfHost printHost, string urlOrFile)
+        internal CoreWebViewHeadlessHost(HtmlToPdfHost htmlToPdfHost)
         {
-            HtmlToPdfHost = printHost;
-            UrlOrFile = urlOrFile;
-
-            WebViewPrintSettings = printHost.WebViewPrintSettings;
-
+            HtmlToPdfHost = htmlToPdfHost;
+            WebViewPrintSettings = htmlToPdfHost.WebViewPrintSettings;
             InitializeAsync();
         }
-
 
         protected async void InitializeAsync()
         {
@@ -57,12 +57,11 @@ namespace Westwind.WebView.HtmlToPdf
             var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: HtmlToPdfHost.WebViewEnvironmentPath);
 
             var controller = await environment.CreateCoreWebView2ControllerAsync( new IntPtr(-3) ); // HWMD_MSG
-
+            
             WebView = controller.CoreWebView2;
-            
-            WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
-            
-            //PrintFromUrlStream(UrlOrFile);
+            _IsInitialized = true;
+                        
+            WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;            
         }
 
 
@@ -80,22 +79,36 @@ namespace Westwind.WebView.HtmlToPdf
                 IsComplete = true;
             }
         }
-
-
-        public void PrintFromUrl(string url, string outputFile)
+        
+        /// <summary>
+        /// Internally navigates the the browser to the document to render
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="outputFile"></param>
+        /// <returns></returns>
+        internal async Task PrintFromUrl(string url, string outputFile)
         {
+            await WaitForInitialized();
+
             PdfPrintOutputMode = PdfPrintOutputModes.File;
             _outputFile = outputFile;
             WebView.Navigate(url);
         }
 
-        public void PrintFromUrlStream(string url)
+        /// <summary>
+        /// Internally navigates t
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public async Task PrintFromUrlStream(string url)
         {
+            await WaitForInitialized();
+
             PdfPrintOutputMode = PdfPrintOutputModes.Stream;
             WebView.Navigate(url);
         }
 
-        public async Task PrintToPdf()
+        internal async Task PrintToPdf()
         {
             var webViewPrintSettings = SetWebViewPrintSettings();
 
@@ -125,7 +138,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// Prints the current document in the WebView to a MemoryStream
         /// </summary>
         /// <returns></returns>
-        public async Task<Stream> PrintToPdfStream()
+        internal async Task<Stream> PrintToPdfStream()
         {
             var webViewPrintSettings = SetWebViewPrintSettings();
 
@@ -151,6 +164,10 @@ namespace Westwind.WebView.HtmlToPdf
             }
         }
 
+        /// <summary>
+        /// Map our private type to the CoreWebView type.                
+        /// </summary>
+        /// <returns></returns>
 
         private CoreWebView2PrintSettings SetWebViewPrintSettings()
         {
@@ -192,6 +209,14 @@ namespace Westwind.WebView.HtmlToPdf
             wvps.PagesPerSide = ps.PagesPerSide;
 
             return wvps;
+        }
+
+        private async Task WaitForInitialized()
+        {
+            while (!_IsInitialized)
+            {
+                await Task.Delay(2);
+            }
         }
 
     }

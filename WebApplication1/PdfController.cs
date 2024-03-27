@@ -77,7 +77,7 @@ namespace WebApplication1
             var file = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
 
             var pdf = new HtmlToPdfHost();
-            var pdfResult = await pdf.PrintToPdfStreamExAsync(file, new WebViewPrintSettings { PageRanges = "1-10" });
+            var pdfResult = await pdf.PrintToPdfStreamAsync(file, new WebViewPrintSettings { PageRanges = "1-10" });
 
             if (pdfResult == null || !pdfResult.IsSuccess)
             {

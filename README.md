@@ -16,14 +16,21 @@ The components requires:
 
 * Running on Windows 11/10 Server 2019/2022
 * App that targets `net8.0-windows` or `net6.0-windows`
-* Running with an Interactive User Context 
-   * Desktop Applications
-   * Console Applications
+* Desktop Applications
+* Console Applications
+* Service Applications
 
 The component does not support:
 
 * Non Windows platforms
-* Running inside of a server, non-logged-on user context (ie. SYSTEM)
+
+### Dependencies
+
+* [WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH&ch=1#download)  
+On recent updates of Windows 11 and 10, the WebView is pre-installed as a system component. On Servers however, you may have to explicitly install the WebView Runtime.
+
+* [Windows Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)  
+The WebView2 component is dependent on Windows desktop libraries and therefore requires the Desktop runtime, even for server applications.
 
 ## Using the library
 
