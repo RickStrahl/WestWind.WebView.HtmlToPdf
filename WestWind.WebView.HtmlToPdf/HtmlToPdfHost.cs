@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using static System.Windows.Forms.DataFormats;
 
 
@@ -309,6 +310,83 @@ namespace Westwind.WebView.HtmlToPdf
             thread.Start();
 
             return tcs.Task;
+        }
+
+
+         public Task<PdfPrintResult> PrintToPdfStreamExAsync(string url,             
+            WebViewPrintSettings webViewPrintSettings = null)
+        {
+            IsComplete = false;
+            WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
+
+            PdfPrintResult result = new() { 
+                IsSuccess = false,
+                Message = "PDF generation didn't complete.",
+            };
+
+            var tcs = new TaskCompletionSource<PdfPrintResult>();
+
+            Thread thread = new Thread( async () =>
+            {
+                _ = Dispatcher.CurrentDispatcher.Invoke(async () =>
+                {
+                    try
+                    {
+                        IsComplete = false;
+
+                        var host = new CoreWebViewHeadlessHost(this, url);
+
+                        await Task.Delay(420);
+
+                        host.PrintFromUrlStream(url);
+
+                        for (int i = 0; i < 200; i++)
+                        {
+                            if (host.IsComplete)
+                                break;
+                            await Task.Delay(50);
+                        }
+                        if (!host.IsComplete)
+                        {
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = false,
+                                Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
+                            };
+                        }
+                        else
+                        {
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = host.IsSuccess,
+                                Message = host.IsSuccess ? "PDF was generated." : "PDF generation failed: " + host.LastException?.Message,
+                                ResultStream = host.ResultStream,
+                                LastException = host.LastException
+                            };
+                        }
+
+                        IsComplete = true;
+                        OnPrintCompleteAction?.Invoke(result);
+                        tcs.SetResult(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = ex.ToString();
+                        result.LastException = ex;
+
+                        tcs.SetResult(result);
+                    }
+
+                    Dispatcher.CurrentDispatcher.BeginInvokeShutdown(DispatcherPriority.Send);
+                });
+                Dispatcher.Run();
+            });
+
+            thread.SetApartmentState(ApartmentState.STA); // MUST BE STA!
+            thread.Start();
+
+            return tcs.Task;            
         }
 
     }

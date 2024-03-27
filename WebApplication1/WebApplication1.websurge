@@ -1,16 +1,22 @@
-GET http://localhost:5063/pdf HTTP/2.0
+GET pdf HTTP/2.0
 Accept: application/json
 Websurge-Request-Name: PDF as Json
 
 ------------------------------------------------------------------
 
-GET http://localhost:5063/pdf/rawpdf HTTP/2.0
+GET pdf/rawpdf HTTP/2.0
 Accept-Encoding: gzip,deflate
 Websurge-Request-Name: Direct PDF access
 
 ------------------------------------------------------------------
 
-GET http://localhost:5063/pdf/ping HTTP/2.0
+GET pdf/rawpdfex HTTP/2.0
+Accept-Encoding: gzip,deflate
+Websurge-Request-Name: Direct PDF access EX
+
+------------------------------------------------------------------
+
+GET pdf/ping HTTP/2.0
 Accept-Encoding: gzip,deflate
 Websurge-Request-Name: Ping Info
 
@@ -20,8 +26,11 @@ Websurge-Request-Name: Ping Info
 ----- Start WebSurge Options -----
 
 {
-  "SiteBaseUrl": null,
-  "RecentSiteBaseUrlList": [],
+  "SiteBaseUrl": "http://localhost:5063/",
+  "RecentSiteBaseUrlList": [
+    "http://localhost:5063/",
+    "http://localhost/PdfWebApp/"
+  ],
   "OnlineSessionId": null,
   "SessionVariables": {
     "WebApplication1_HostAddress": "http://localhost:5063"
@@ -50,7 +59,7 @@ Websurge-Request-Name: Ping Info
   "Users": [],
   "UserAgent": null,
   "CaptureMinimalResponseData": false,
-  "MaxResponseSize": 99999,
+  "MaxResponseSize": 9999999,
   "Documentation": []
 }
 

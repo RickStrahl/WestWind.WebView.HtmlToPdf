@@ -68,6 +68,31 @@ namespace WebApplication1
         }
 
         /// <summary>
+        /// Return raw data as PDF
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("rawpdfex")]
+        public async Task<IActionResult> RawPdfEx()
+        {
+            var file = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
+
+            var pdf = new HtmlToPdfHost();
+            var pdfResult = await pdf.PrintToPdfStreamExAsync(file, new WebViewPrintSettings { PageRanges = "1-10" });
+
+            if (pdfResult == null || !pdfResult.IsSuccess)
+            {
+                Response.StatusCode = 500;
+                return new JsonResult(new
+                {
+                    isError = true,
+                    message = pdfResult.Message
+                });
+            }
+
+            return new FileStreamResult(pdfResult.ResultStream, "application/pdf");
+        }
+
+        /// <summary>
         /// Status info to ensure app works
         /// </summary>
         /// <returns></returns>

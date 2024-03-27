@@ -4,7 +4,7 @@
 		<Version>0.2.1</Version>
 		<TargetFrameworks>net6.0-windows;net8.0-windows</TargetFrameworks>		
 		<UseWindowsForms>True</UseWindowsForms>
-
+		<UseWPF>True</UseWPF>
 		<Authors>Rick Strahl</Authors>
 		<Company>West Wind Technologies</Company>
 		<Product>West Wind WebView Html To PDF</Product>
