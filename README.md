@@ -12,25 +12,26 @@ This library provides a quick way to print HTML to PDF on Windows using the WebV
 This library uses the built-in **WebView2 Runtime in Windows so it has no external dependencies for your applications** assuming you are running on a recent version of Windows that has the WebView2 Runtime installed.
 
 ## Prerequisites
-The components requires:
+The components works with:
 
-* Running on Windows 11/10 Server 2019/2022
-* App that targets `net8.0-windows` or `net6.0-windows`
+* Windows 11/10 Server 2019/2022
+* Apps that target `net8.0-windows` or `net6.0-windows`
 * Desktop Applications
 * Console Applications
-* Service Applications
+* Service Application
 
 The component does not support:
 
 * Non Windows platforms
 
 ### Dependencies
+Deployed applications have the following dependencies:  
 
 * [WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/?form=MA13LH&ch=1#download)  
 On recent updates of Windows 11 and 10, the WebView is pre-installed as a system component. On Servers however, you may have to explicitly install the WebView Runtime.
 
 * [Windows Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)  
-The WebView2 component is dependent on Windows desktop libraries and therefore requires the Desktop runtime, even for server applications.
+The WebView2 component is dependent on Windows Desktop Runtime libraries and therefore requires the Desktop runtime to be installed **even for server applications**. 
 
 ## Using the library
 
