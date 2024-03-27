@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Support", "Support", "{AD40CB9C-37A2-497A-AB59-E0D634A2FF20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{0EF5064B-FA8C-4B52-B064-4F60F43FACFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{A99DB5D0-033E-4221-8C38-5331DD439486}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A99DB5D0-033E-4221-8C38-5331DD439486}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A99DB5D0-033E-4221-8C38-5331DD439486}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EF5064B-FA8C-4B52-B064-4F60F43FACFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EF5064B-FA8C-4B52-B064-4F60F43FACFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EF5064B-FA8C-4B52-B064-4F60F43FACFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EF5064B-FA8C-4B52-B064-4F60F43FACFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +42,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{413ED39E-1965-40D7-88B0-CA5DF91FDF89} = {AD40CB9C-37A2-497A-AB59-E0D634A2FF20}
 		{A99DB5D0-033E-4221-8C38-5331DD439486} = {AD40CB9C-37A2-497A-AB59-E0D634A2FF20}
+		{0EF5064B-FA8C-4B52-B064-4F60F43FACFC} = {AD40CB9C-37A2-497A-AB59-E0D634A2FF20}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B163354-AB5A-4370-82F7-E719157ED695}

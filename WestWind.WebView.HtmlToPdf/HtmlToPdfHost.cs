@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.Web.WebView2.Core;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using static System.Windows.Forms.DataFormats;
 
 
 namespace Westwind.WebView.HtmlToPdf
@@ -42,6 +45,11 @@ namespace Westwind.WebView.HtmlToPdf
         /// https://weblog.west-wind.com/posts/2023/Oct/31/Caching-your-WebView-Environment-to-manage-multiple-WebView2-Controls
         /// </summary>
         public string WebViewEnvironmentPath { get; set; } = Path.Combine(Path.GetTempPath(), "WebView2_Environment");
+
+        /// <summary>
+        /// Max Render Timeout for PDF output generation
+        /// </summary>
+        public int RenderTimeoutMs { get; set; } = 10000;
 
         /// <summary>
         /// This method prints a PDF from an HTML URl or File to PDF 
@@ -134,7 +142,7 @@ namespace Westwind.WebView.HtmlToPdf
                     form.Left = 100_000;
                     form.Top = 100_000;
                     form.PrintFromUrlStream(url);
-                    form.ShowDialog();
+                    form.ShowDialog();                    
                     form.Close();  // ensure form closes 
 
                     result = new PdfPrintResult()
@@ -184,27 +192,36 @@ namespace Westwind.WebView.HtmlToPdf
 
             var tcs = new TaskCompletionSource<PdfPrintResult>();
 
-            Thread thread = new Thread(() =>
+            Thread thread = new Thread( () =>
             {
                 try
                 {
                     IsComplete = false;
 
                     var form = new WebViewFormHost(this);
-                    form.Left = 10_000;
-                    form.Top = 10_000;
+                    form.Left = 10;
+                    form.Top = 10;
                     form.Height = 1;
                     form.Width = 1;
                     form.PrintFromUrl(url, outputFile);
                     form.ShowDialog();
-                    form.Close();  // ensure form closes 
 
-                    result = new PdfPrintResult()
+                    if (!form.IsComplete)
                     {
-                        IsSuccess = form.IsSuccess,
-                        Message = form.IsSuccess ? "PDF was generated." : "PDF generation failed: " + form.LastException?.Message,
-                        LastException = form.LastException
-                    };
+                        result = new PdfPrintResult()
+                        {
+                            IsSuccess = false,
+                            Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
+                        };
+                     }
+                    else {
+                        result = new PdfPrintResult()
+                        {
+                            IsSuccess = form.IsSuccess,
+                            Message = form.IsSuccess ? "PDF was generated." : "PDF generation failed: " + form.LastException?.Message,
+                            LastException = form.LastException
+                        };
+                    }
 
                     IsComplete = true;
                     OnPrintCompleteAction?.Invoke(result);
@@ -250,7 +267,7 @@ namespace Westwind.WebView.HtmlToPdf
 
             var tcs = new TaskCompletionSource<PdfPrintResult>();
 
-            Thread thread = new Thread(() =>
+            Thread thread = new Thread( () =>
             {
                 try
                 {
@@ -263,6 +280,7 @@ namespace Westwind.WebView.HtmlToPdf
                     form.Height = 1;
                     form.PrintFromUrlStream(url);
                     form.ShowDialog();
+                   
                     form.Close();  // ensure form closes 
 
                     result = new PdfPrintResult()

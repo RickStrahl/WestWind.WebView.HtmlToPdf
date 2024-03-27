@@ -20,6 +20,8 @@ namespace Westwind.WebView.HtmlToPdf
 
         public Stream ResultStream { get; set; }
 
+        public bool IsComplete { get; set; }
+
 
         private PdfPrintOutputModes PdfPrintOutputMode { get; set; } = PdfPrintOutputModes.File;
 
@@ -43,16 +45,23 @@ namespace Westwind.WebView.HtmlToPdf
             
             await WebView.EnsureCoreWebView2Async(environment);
 
-            WebView.CoreWebView2.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
+            WebView.CoreWebView2.DOMContentLoaded += CoreWebView2_DOMContentLoaded;            
         }
 
 
         private async void CoreWebView2_DOMContentLoaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2DOMContentLoadedEventArgs e)
         {
-            if (PdfPrintOutputMode == PdfPrintOutputModes.File)
-                await PrintToPdf();
-            else
-                await PrintToPdfStream();
+            try
+            {
+                if (PdfPrintOutputMode == PdfPrintOutputModes.File)
+                    await PrintToPdf();
+                else
+                    await PrintToPdfStream();
+            }
+            finally
+            {
+                IsComplete = true;
+            }
         }
 
 
