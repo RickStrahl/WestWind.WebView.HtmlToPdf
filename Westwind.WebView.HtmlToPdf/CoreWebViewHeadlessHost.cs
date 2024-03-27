@@ -51,12 +51,14 @@ namespace Westwind.WebView.HtmlToPdf
             InitializeAsync();
         }
 
+        private IntPtr HWND_MESSAGE = new IntPtr(-3);
+
         protected async void InitializeAsync()
         {
             // must create a data folder if running out of a secured folder that can't write like Program Files
             var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: HtmlToPdfHost.WebViewEnvironmentPath);
 
-            var controller = await environment.CreateCoreWebView2ControllerAsync( new IntPtr(-3) ); // HWMD_MSG
+            var controller = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE); 
             
             WebView = controller.CoreWebView2;
             _IsInitialized = true;
