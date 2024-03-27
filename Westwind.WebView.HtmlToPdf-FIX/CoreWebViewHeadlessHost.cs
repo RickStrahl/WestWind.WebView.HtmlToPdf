@@ -65,20 +65,6 @@ namespace Westwind.WebView.HtmlToPdf
         }
 
 
-        private async void CoreWebView2_DOMContentLoaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2DOMContentLoadedEventArgs e)
-        {
-            try
-            {
-                if (PdfPrintOutputMode == PdfPrintOutputModes.File)
-                    await PrintToPdf();
-                else
-                    await PrintToPdfStream();
-            }
-            finally
-            {
-                IsComplete = true;
-            }
-        }
         
         /// <summary>
         /// Internally navigates the the browser to the document to render
@@ -106,6 +92,22 @@ namespace Westwind.WebView.HtmlToPdf
 
             PdfPrintOutputMode = PdfPrintOutputModes.Stream;
             WebView.Navigate(url);
+        }
+
+
+        private async void CoreWebView2_DOMContentLoaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2DOMContentLoadedEventArgs e)
+        {
+            try
+            {
+                if (PdfPrintOutputMode == PdfPrintOutputModes.File)
+                    await PrintToPdf();
+                else
+                    await PrintToPdfStream();
+            }
+            finally
+            {
+                IsComplete = true;
+            }
         }
 
         internal async Task PrintToPdf()
