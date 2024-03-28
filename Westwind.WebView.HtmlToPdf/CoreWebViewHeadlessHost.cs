@@ -149,16 +149,15 @@ namespace Westwind.WebView.HtmlToPdf
             try
             {
                 // we have to turn the stream into something physical because the form won't stay alive
-                await using var stream = await WebView.PrintToPdfStreamAsync(webViewPrintSettings);
-                var ms = new MemoryStream();
-                await stream.CopyToAsync(ms);
-                ms.Position = 0;
-                ResultStream = ms;
-
-              
-
-                IsSuccess = true;
-                return ResultStream;
+                using (var stream = await WebView.PrintToPdfStreamAsync(webViewPrintSettings))
+                {
+                    var ms = new MemoryStream();
+                    await stream.CopyToAsync(ms);
+                    ms.Position = 0;
+                    ResultStream = ms;
+                    IsSuccess = true;
+                    return ResultStream;
+                }
             }
             catch (Exception ex)
             {

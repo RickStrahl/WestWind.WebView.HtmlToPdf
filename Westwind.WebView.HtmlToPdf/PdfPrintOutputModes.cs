@@ -1,7 +1,8 @@
-﻿namespace Westwind.WebView.HtmlToPdf;
-
-internal enum PdfPrintOutputModes
+﻿namespace Westwind.WebView.HtmlToPdf
 {
-    File,
-    Stream
+    internal enum PdfPrintOutputModes
+    {
+        File,
+        Stream
+    }
 }

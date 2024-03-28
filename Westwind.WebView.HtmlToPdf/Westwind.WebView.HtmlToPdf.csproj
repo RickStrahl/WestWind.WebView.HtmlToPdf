@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.3</Version>
-		<TargetFrameworks>net6.0-windows;net8.0-windows</TargetFrameworks>		
+		<Version>0.4</Version>
+		<TargetFrameworks>net6.0-windows;net8.0-windows;net472</TargetFrameworks>		
 		<UseWindowsForms>True</UseWindowsForms>	
 		<Authors>Rick Strahl</Authors>
 		<Company>West Wind Technologies</Company>

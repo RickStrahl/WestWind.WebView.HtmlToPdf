@@ -1,14 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-
+    <TargetFrameworks>net8.0-windows;net472</TargetFrameworks>    
     <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-	  <UseWPF>true</UseWPF>
-	  
+    <IsTestProject>true</IsTestProject>	  	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,9 +18,7 @@
     <ProjectReference Include="..\WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
-  </ItemGroup>
+
 
   <ItemGroup>
     <None Update="HtmlSampleFile-SelfContained.html">

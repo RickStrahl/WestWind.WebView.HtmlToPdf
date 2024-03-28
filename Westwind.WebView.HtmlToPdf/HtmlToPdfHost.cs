@@ -65,7 +65,7 @@ namespace Westwind.WebView.HtmlToPdf
         {
             WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
 
-            PdfPrintResult result = new()
+            PdfPrintResult result = new PdfPrintResult
             {
                 IsSuccess = false,
                 Message = "PDF generation didn't complete.",
@@ -145,7 +145,7 @@ namespace Westwind.WebView.HtmlToPdf
         {
             WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
 
-            PdfPrintResult result = new()
+            PdfPrintResult result = new PdfPrintResult
             {
                 IsSuccess = false,
                 Message = "PDF generation didn't complete.",
@@ -235,7 +235,7 @@ namespace Westwind.WebView.HtmlToPdf
             IsComplete = false;
             WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
 
-            PdfPrintResult result = new() { 
+            PdfPrintResult result = new PdfPrintResult { 
                 IsSuccess = false,
                 Message = "PDF generation didn't complete.",
             };
@@ -320,7 +320,7 @@ namespace Westwind.WebView.HtmlToPdf
             IsComplete = false;
             WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
 
-            PdfPrintResult result = new()
+            PdfPrintResult result = new PdfPrintResult()
             {
                 IsSuccess = false,
                 Message = "PDF generation didn't complete.",

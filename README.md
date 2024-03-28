@@ -24,6 +24,12 @@ The component does not support:
 
 * Non Windows platforms
 
+Targets:
+
+* net8.0-windows
+* net6.0-windows
+* net472
+
 ### Dependencies
 Deployed applications have the following dependencies:  
 
