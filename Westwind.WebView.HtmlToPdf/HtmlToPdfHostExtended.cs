@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using HtmlAgilityPack;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using UglyToad.PdfPig.Outline.Destinations;
 using UglyToad.PdfPig.Outline;
@@ -14,12 +10,10 @@ using UglyToad.PdfPig.Writer;
 using UglyToad.PdfPig;
 using Westwind.Utilities;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
-using System.Xml.Linq;
-using System.Reflection;
 
 namespace Westwind.WebView.HtmlToPdf
 {
-    public class HtmlToPdfExtended : HtmlToPdfHost
+    public class HtmlToPdfHostExtended : HtmlToPdfHost
     {
         public override async Task<PdfPrintResult> PrintToPdfStreamAsync(string url, WebViewPrintSettings webViewPrintSettings = null)
         {
@@ -69,12 +63,7 @@ namespace Westwind.WebView.HtmlToPdf
             if (nodes == null)
                 return null;
 
-
             var headers = new List<HeaderItem>();
-            
-            var root  = new HeaderItem { Level = 0 };  // root
-            HeaderItem lastHeaderItem = root;
-            HeaderItem parentHeaderItem = lastHeaderItem;
             foreach (var node in nodes)
             {                
                 var text = node.InnerText.Trim();
@@ -86,9 +75,72 @@ namespace Westwind.WebView.HtmlToPdf
                 headers.Add(headerItem);         
             }
 
+            headers = BuildTree(headers);
+
             return headers;
         }
 
+        public List<HeaderItem> BuildTree(List<HeaderItem> headers)
+        {
+            HeaderItem rootItem = new HeaderItem();
+
+            int lastIndex = 0;
+
+            for(int i = 0; i < headers.Count; i++)
+            {
+                var item = headers[i];
+                var lastItem = headers[lastIndex];
+
+                if (item.Level == 1)
+                {
+                    rootItem.Children.Add(item);
+                    item.Parent = rootItem;
+                }
+                else if (item.Level == lastItem.Level)
+                {
+                    if (lastItem.Parent == null)
+                    {
+                        rootItem.Children.Add(item);
+                        item.Parent = rootItem;
+                    }
+                    else
+                    {
+                        lastItem.Parent.Children.Add(item);
+                        item.Parent = headers[lastIndex].Parent;
+                    }
+                }
+                else if (item.Level > lastItem.Level)
+                {
+                        lastItem.Children.Add(item);
+                        item.Parent = headers[lastIndex];                
+                }
+                else if (item.Level < lastItem.Level)
+                {
+                    if (lastItem.Parent == null)
+                    {
+                        rootItem.Children.Add(item);
+                        item.Parent = rootItem;
+                    }
+                    else
+                    {
+
+                        var parent = lastItem.Parent;
+                        while (parent != null && item.Level < parent.Level)
+                        {
+                            parent = parent.Parent;
+                        }
+
+                        parent.Parent.Children.Add(item);
+                        item.Parent = parent.Parent;
+                    }
+                }
+
+
+                lastIndex = i;
+            }
+
+            return rootItem.Children;
+        }
         
 
 
@@ -125,13 +177,20 @@ namespace Westwind.WebView.HtmlToPdf
                 {
                     var pageLinkItem = pageLinkList.FirstOrDefault(pll => pll.Text.Contains(headerItem.Text ));
                     if (pageLinkItem == null) continue;
-                    
+
+                    var childList = AddChildren(headerItem, pageLinkList);
+
                     var node = new DocumentBookmarkNode(headerItem.Text,  
                         headerItem.Level,
                         new ExplicitDestination(pageLinkItem.PageIndex, ExplicitDestinationType.XyzCoordinates, ExplicitDestinationCoordinates.Empty),
-                        Array.Empty<BookmarkNode>());
+                        childList);
+                    
+
                     bookmarkList.Add(node);
-                }                
+                }   
+                
+
+
                 builder.Bookmarks = new Bookmarks(bookmarkList);
 
                 return builder.Build();                
@@ -139,9 +198,37 @@ namespace Westwind.WebView.HtmlToPdf
 
         }
 
-    }
+        List<BookmarkNode> AddChildren(HeaderItem topLevelHeaderItem, List<PageLinkItem> pageLinkList)
+        {            
+            var list = new List<BookmarkNode>();
 
-    [DebuggerDisplay("{Level} - {Text}")]
+            foreach(var headerItem in topLevelHeaderItem.Children)
+            {
+                List<BookmarkNode> childList = new List<BookmarkNode>();
+                if (headerItem.Children.Count > 0)
+                {                    
+                    childList = AddChildren(headerItem, pageLinkList);
+                }
+
+                var pageLinkItem = pageLinkList.FirstOrDefault(pll => pll.Text.Contains(headerItem.Text));
+                if (pageLinkItem == null) continue;
+
+                var node = new DocumentBookmarkNode(headerItem.Text,
+                    headerItem.Level,
+                    new ExplicitDestination(pageLinkItem.PageIndex, ExplicitDestinationType.XyzCoordinates, ExplicitDestinationCoordinates.Empty),
+                    childList);
+                list.Add(node);
+            }
+
+            return list;
+        }
+
+
+
+    
+
+    }
+    
     public class HeaderItem
     {
         public string Text { get; set; }
@@ -153,11 +240,23 @@ namespace Westwind.WebView.HtmlToPdf
         public HeaderItem Parent { get; set; }
 
         public List<HeaderItem> Children { get; set; } = new List<HeaderItem>();
+
+        public override string ToString()
+        {
+            return $"{Level} - {Text} - {Children.Count}";
+        }
     }
 
+
+    
     public class PageLinkItem
     {
         public int PageIndex { get; set; }
         public string Text { get; set; }
+
+        public override string ToString()
+        {
+            return $"{PageIndex} - {Text}";
+        }
     }
 }

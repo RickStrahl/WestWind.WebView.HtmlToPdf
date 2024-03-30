@@ -18,7 +18,7 @@ using Westwind.WebView.HtmlToPdf;
 namespace Westwind.HtmlToPdf.Test
 {
     [TestClass]
-    public class PdfPigTests
+    public class HtmlToPdfExtendedTests
     {
         public string SampleHtml { get; set; } = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
         public string SamplePdf { get; set; } = Path.GetFullPath("PdfSampleFile.pdf");
@@ -27,7 +27,7 @@ namespace Westwind.HtmlToPdf.Test
         [TestMethod]
         public async Task PrintPdfStreamAsyncExtendedTest()
         {
-            var pdf = new HtmlToPdfExtended();
+            var pdf = new HtmlToPdfHostExtended();
             var result = await pdf.PrintToPdfStreamAsync(SampleHtml);
 
             File.Delete(SamplePdf_Outline);
@@ -42,6 +42,25 @@ namespace Westwind.HtmlToPdf.Test
             ShellUtils.OpenUrl(SamplePdf_Outline);
         }
 
+
+
+        [TestMethod]
+        public async Task PrintPdfStreamAsyncFromUrlExtendedTest()
+        {
+            var pdf = new HtmlToPdfHostExtended();
+            var result = await pdf.PrintToPdfStreamAsync("https://microsoft.com");
+
+            File.Delete(SamplePdf_Outline);
+            using (var fstream = new FileStream(SamplePdf_Outline, FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                result.ResultStream.CopyTo(fstream);
+                result.ResultStream.Close(); // Close returned stream!
+
+                ShellUtils.OpenUrl(SamplePdf_Outline);
+            }
+            Assert.IsNotNull(result, result.Message);
+            ShellUtils.OpenUrl(SamplePdf_Outline);
+        }
 
 
         [TestMethod]
