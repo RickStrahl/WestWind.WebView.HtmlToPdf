@@ -8,11 +8,20 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Docnet.Core" Version="2.6.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
     <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageReference Include="PdfPig" Version="0.1.8" />
     <PackageReference Include="Westwind.Utilities" Version="4.0.20" />
   </ItemGroup>
+
+<PropertyGroup Condition="'$(TargetFramework)' != 'net462'">
+	<DefineConstants>NETCORE;</DefineConstants>
+</PropertyGroup>
+<PropertyGroup Condition=" '$(TargetFramework)' == 'net462'">
+	<DefineConstants>NETFULL</DefineConstants>
+</PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj" />
@@ -26,6 +35,9 @@
     </None>
     <None Update="HtmlSampleFileLonger-SelfContained.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="PdfSampleFile.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

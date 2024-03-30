@@ -314,7 +314,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// </summary>
         /// <param name="url">File or URL to print to PDF</param>        
         /// <param name="webViewPrintSettings">WebView PDF generation settings</param>       
-        public Task<PdfPrintResult> PrintToPdfStreamAsync(string url,
+        public virtual Task<PdfPrintResult> PrintToPdfStreamAsync(string url,
            WebViewPrintSettings webViewPrintSettings = null)
         {
             IsComplete = false;

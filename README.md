@@ -198,3 +198,5 @@ host.PrintToPdfStream(htmlFile, pdfPrintSettings);
 
 The `Task` based methods are easiest to use so that's the recommended syntax. The event based methods are there so you can more easily use this if you are not running in some sort of async environment already. Both approaches run on a separate STA thread to ensure that the WebView can run regardless of whether you are running inside of an application that has a main UI/STA thread.
 
+## Support
+If you use this project and it provides value to you, please consider supporting by contributing or supporting via the sponsor link or one time donation at the top of this page. Value for value.
