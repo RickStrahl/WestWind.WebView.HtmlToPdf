@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -77,10 +78,12 @@ namespace Westwind.PdfToHtml.Test
                 Collation = WebViewPrintCollations.UnCollated,
                  Duplex = WebViewPrintDuplexes.TwoSidedShortEdge
             };
+
+            // output file is created
             var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
 
             Assert.IsTrue(result.IsSuccess, result.Message);
-            ShellUtils.OpenUrl(outputFile);
+            ShellUtils.OpenUrl(outputFile);  // display it
         }
 
 
@@ -100,7 +103,7 @@ namespace Westwind.PdfToHtml.Test
             var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
 
             var host = new HtmlToPdfHost();
-            host.OnPrintCompleteAction = (result) =>
+            Action<PdfPrintResult> onPrintComplete = (result) =>
             {
                 if (result.IsSuccess)
                 {
@@ -133,7 +136,7 @@ namespace Westwind.PdfToHtml.Test
                 ScaleFactor = 0.8f,
                 PageRanges = "1,2,5-8"
             };
-            host.PrintToPdfStream(htmlFile, pdfPrintSettings);
+            host.PrintToPdfStream(htmlFile, onPrintComplete, pdfPrintSettings) ;
 
             for (int i = 0; i < 50; i++)
             {
@@ -162,8 +165,9 @@ namespace Westwind.PdfToHtml.Test
             var outputFile = Path.GetFullPath(@".\test.pdf");
             File.Delete(outputFile);
 
-            var host = new HtmlToPdfHost();            
-            host.OnPrintCompleteAction = (result) =>
+            var host = new HtmlToPdfHost();           
+            
+            Action<PdfPrintResult> onPrintComplete = (result) =>
             {
                 if (result.IsSuccess)
                 {
@@ -175,7 +179,7 @@ namespace Westwind.PdfToHtml.Test
                     Assert.Fail(result.Message);
                 }
             };
-            host.PrintToPdf(htmlFile, outputFile);
+            host.PrintToPdf(htmlFile,  outputFile, onPrintComplete);
 
             // have to wait for completion of event callback
             for (int i = 0; i < 50; i++)

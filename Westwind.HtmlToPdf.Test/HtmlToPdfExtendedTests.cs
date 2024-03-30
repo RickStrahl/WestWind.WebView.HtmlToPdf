@@ -28,7 +28,10 @@ namespace Westwind.HtmlToPdf.Test
         public async Task PrintPdfStreamAsyncExtendedTest()
         {
             var pdf = new HtmlToPdfHostExtended();
-            var result = await pdf.PrintToPdfStreamAsync(SampleHtml);
+            var result = await pdf.PrintToPdfStreamAsync(SampleHtml, new WebViewPrintSettings
+            {
+                ScaleFactor = 1F
+            }) ;
 
             File.Delete(SamplePdf_Outline);
             using (var fstream = new FileStream(SamplePdf_Outline, FileMode.OpenOrCreate, FileAccess.Write))
@@ -45,75 +48,73 @@ namespace Westwind.HtmlToPdf.Test
 
 
         [TestMethod]
-        public async Task PrintPdfStreamAsyncFromUrlExtendedTest()
+        public async Task PrintPdfAsyncFromUrlExtendedTest()
         {
-            var pdf = new HtmlToPdfHostExtended();
-            var result = await pdf.PrintToPdfStreamAsync("https://microsoft.com");
+            var pdf = new HtmlToPdfHostExtended() { MaxTocOutlineLevel = 3 };
+            var result = await pdf.PrintToPdfAsync(SampleHtml, SamplePdf_Outline);
 
-            File.Delete(SamplePdf_Outline);
-            using (var fstream = new FileStream(SamplePdf_Outline, FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                result.ResultStream.CopyTo(fstream);
-                result.ResultStream.Close(); // Close returned stream!
+            Assert.IsTrue(result.IsSuccess,result.Message);
 
-                ShellUtils.OpenUrl(SamplePdf_Outline);
-            }
-            Assert.IsNotNull(result, result.Message);
             ShellUtils.OpenUrl(SamplePdf_Outline);
         }
 
 
         [TestMethod]
-        public void PdfPigTest()
+        public async Task PrintPdfStreamExtendedTest()
         {
+            var pdf = new HtmlToPdfHostExtended();            
+            var tcs = new TaskCompletionSource();
 
-
-
-
-
-            File.Delete(SamplePdf_Outline);
-            var pages = new List<Page>();
-            var builder = new PdfDocumentBuilder();
-
-            using (var pdf = PdfDocument.Open(SamplePdf))
+            var onPrintComplete = (PdfPrintResult result) =>
             {
-                int count = 0;
-                var existingPages = pdf.GetPages();
-                foreach (var page in existingPages)
+                Assert.IsTrue(result.IsSuccess, result.Message);
+
+                File.Delete(SamplePdf_Outline);
+                using (var fstream = new FileStream(SamplePdf_Outline, FileMode.OpenOrCreate, FileAccess.Write))
                 {
-                    
-                    // Either extract based on order in the underlying document with newlines and spaces.
-                    var text = ContentOrderTextExtractor.GetText(page);
-
-                    var marked = page.GetMarkedContents();
-
-                    // Or based on grouping letters into words.
-                    var otherText = string.Join(" ", page.GetWords());
-
-                    // Or the raw text of the page's content stream.
-                    var rawText = page.Text;
-
-                    count++;
-                    Console.WriteLine("\nPage " + count);
-                    Console.WriteLine("--------------------------");
-                    Console.WriteLine(text);
-
-                    builder.AddPage(pdf, count);
+                    result.ResultStream.CopyTo(fstream);
                 }
+                result.ResultStream.Close(); // Close returned stream!    
+                ShellUtils.OpenUrl(SamplePdf_Outline);
 
-                // Create Table of Contents
-                var node = new DocumentBookmarkNode("Chapter 1", 1,
-                    new ExplicitDestination(1, ExplicitDestinationType.XyzCoordinates, ExplicitDestinationCoordinates.Empty), 
-                    Array.Empty<BookmarkNode>());
+                tcs.SetResult();
+            };        
 
-                builder.Bookmarks = new Bookmarks(new List<DocumentBookmarkNode>() { node });
-                byte[] documentBytes = builder.Build();
+            pdf.PrintToPdfStream(SampleHtml, onPrintComplete, new WebViewPrintSettings
+            {
+                ScaleFactor = 1F
+            });
 
-                File.WriteAllBytes(SamplePdf_Outline, documentBytes);
-            }
-
-            ShellUtils.OpenUrl(SamplePdf_Outline);
+            await tcs.Task;
         }
+
+
+        [TestMethod]
+        public async Task PrintPdfExtendedTest()
+        {
+            var pdf = new HtmlToPdfHostExtended();
+            var tcs = new TaskCompletionSource();
+
+            var onPrintComplete = (PdfPrintResult result) =>
+            {
+                Assert.IsTrue(result.IsSuccess, result.Message);
+
+                File.Delete(SamplePdf_Outline);
+               
+                ShellUtils.OpenUrl(SamplePdf_Outline);
+
+                tcs.SetResult();
+            };
+
+            pdf.PrintToPdf(SampleHtml, SamplePdf_Outline, onPrintComplete, new WebViewPrintSettings
+            {
+                ScaleFactor = 1F
+            });
+
+            await tcs.Task;
+        }
+
+
     }
 
 }

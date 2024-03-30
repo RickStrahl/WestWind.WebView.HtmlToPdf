@@ -45,11 +45,11 @@ namespace ConsoleApp1
 
             string outputFile = Path.Combine("c:\\temp", "test.pdf");
             File.Delete(outputFile);
-            var pdfHost = new HtmlToPdfHost()
+            var pdfHost = new HtmlToPdfHostExtended()
             {
                 WebViewEnvironmentPath = "C:\\temp\\WebViewEnvironment"
             };
-            pdfHost.OnPrintCompleteAction += (result) => {
+            Action<PdfPrintResult> onPrintResult =  (result) => {
                 if (result.IsSuccess)
                 {
                     Console.WriteLine("Opening Pdf file (Callback): " + outputFile);
@@ -64,7 +64,7 @@ namespace ConsoleApp1
             };
 
             // full file path or url
-            pdfHost.PrintToPdf(Path.GetFullPath("./HtmlSampleFileLonger-SelfContained.html"), outputFile);
+            pdfHost.PrintToPdf(Path.GetFullPath("./HtmlSampleFileLonger-SelfContained.html"),  outputFile, onPrintResult);
            
             // wait for completion
             Console.ReadKey();
