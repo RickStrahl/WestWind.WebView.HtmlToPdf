@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj" />
+	  <!-- Using the base version of the library which doesn't create a TOC - faster and much smaller footprint -->
+      <!--<ProjectReference Include="..\WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj" />-->
+	  
+	  <!-- Use the .extended pacakge if you want TOC and CSS injection for print formatting -->
+	  <ProjectReference Include="..\WestWind.WebView.HtmlToPdf.Extended\Westwind.WebView.HtmlToPdf.Extended.csproj" />
   </ItemGroup>
 
   <ItemGroup>

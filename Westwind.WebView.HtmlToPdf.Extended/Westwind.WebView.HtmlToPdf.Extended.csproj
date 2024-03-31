@@ -35,12 +35,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
 		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2420.47" />
+		<PackageReference Include="PdfPig" Version="0.1.8" />
+		<PackageReference Include="Westwind.Utilities" Version="4.0.20" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="../icon.png" Pack="true" PackagePath="" />
 		<None Include="../LICENSE.md" Pack="true" PackagePath="" />
 		<None Include="../README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj" />
 	</ItemGroup>
 </Project>

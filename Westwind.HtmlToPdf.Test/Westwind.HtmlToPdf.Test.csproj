@@ -24,7 +24,7 @@
 </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj" />
+    <ProjectReference Include="..\WestWind.WebView.HtmlToPdf.Extended\Westwind.WebView.HtmlToPdf.Extended.csproj" />
   </ItemGroup>
 
 

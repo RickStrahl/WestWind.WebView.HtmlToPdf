@@ -45,11 +45,13 @@ namespace ConsoleApp1
 
             string outputFile = Path.Combine("c:\\temp", "test.pdf");
             File.Delete(outputFile);
+
+            // Using the non-extended version of the host (no TOC support)
             var pdfHost = new HtmlToPdfHostExtended()
             {
                 WebViewEnvironmentPath = "C:\\temp\\WebViewEnvironment"
             };
-            Action<PdfPrintResult> onPrintResult =  (result) => {
+            var onPrintResult =  (PdfPrintResult result) => {
                 if (result.IsSuccess)
                 {
                     Console.WriteLine("Opening Pdf file (Callback): " + outputFile);

@@ -94,13 +94,11 @@ namespace Westwind.HtmlToPdf.Test
         {
             var pdf = new HtmlToPdfHostExtended();
             var tcs = new TaskCompletionSource();
+            File.Delete(SamplePdf_Outline);
 
             var onPrintComplete = (PdfPrintResult result) =>
             {
                 Assert.IsTrue(result.IsSuccess, result.Message);
-
-                File.Delete(SamplePdf_Outline);
-               
                 ShellUtils.OpenUrl(SamplePdf_Outline);
 
                 tcs.SetResult();

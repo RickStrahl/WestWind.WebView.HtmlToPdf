@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Westwind.WebView.HtmlToPdf;
 
 namespace WebApplication1
@@ -51,7 +52,7 @@ namespace WebApplication1
         {
             var file = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
 
-            var pdf = new HtmlToPdfHostExtended();
+            var pdf = new HtmlToPdfHost();
             var pdfResult = await pdf.PrintToPdfStreamAsync(file, new WebViewPrintSettings {  PageRanges = "1-10"});
 
             if (pdfResult == null || !pdfResult.IsSuccess)
@@ -71,13 +72,14 @@ namespace WebApplication1
         /// Return raw data as PDF
         /// </summary>
         /// <returns></returns>
-        [HttpGet("rawpdfex")]
-        public async Task<IActionResult> RawPdfEx()
-        {
-            var file = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
+        [HttpGet("PdfFromUrl")]
+        public async Task<IActionResult> PdfFromUrl([FromQuery] string url)
+        {            
+            if (string.IsNullOrEmpty(url))
+                url = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
 
-            var pdf = new HtmlToPdfHost();
-            var pdfResult = await pdf.PrintToPdfStreamAsync(file, new WebViewPrintSettings { PageRanges = "1-10" });
+            var pdf = new HtmlToPdfHostExtended();
+            var pdfResult = await pdf.PrintToPdfStreamAsync(url, new WebViewPrintSettings {  });
 
             if (pdfResult == null || !pdfResult.IsSuccess)
             {
@@ -89,7 +91,7 @@ namespace WebApplication1
                 });
             }
 
-            return new FileStreamResult(pdfResult.ResultStream, "application/pdf");
+            return new FileStreamResult(pdfResult.ResultStream,  "application/pdf");
         }
 
         /// <summary>

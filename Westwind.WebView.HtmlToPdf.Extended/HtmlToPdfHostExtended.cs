@@ -98,6 +98,18 @@ namespace Westwind.WebView.HtmlToPdf
             return printResult;
         }
 
+
+        /// <summary>
+        /// This method prints a PDF from an HTML URl or File to PDF 
+        /// using a new thread and a hosted form returning the result
+        /// as an in-memory stream in result.ResultStream.
+        /// 
+        /// You get notified via onPrintComplete 'event' (Action) if
+        /// you pass it in.
+        /// </summary>
+        /// <param name="url">The filename or URL to print to PDF</param>
+        /// <param name="onPrintComplete">Optional action to fire when printing (or failure) is complete</param>
+        /// <param name="webViewPrintSettings">PDF output options</param>
         public override void PrintToPdfStream(string url, Action<PdfPrintResult> onPrintComplete = null, WebViewPrintSettings webViewPrintSettings = null)
         {
         
@@ -155,6 +167,24 @@ namespace Westwind.WebView.HtmlToPdf
                     printResult.IsSuccess = false;
                     printResult.Message = ex.Message;
                 }
+
+                try
+                {
+                    File.Delete(outputFile);
+                    using (var fstream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+                    {
+                        printResult.ResultStream.CopyTo(fstream);
+                    }
+                    printResult.ResultStream?.Close();
+                    printResult.ResultStream = null;
+                }
+                catch (Exception ex)
+                {
+                    printResult.LastException = ex;
+                    printResult.IsSuccess = false;
+                    printResult.Message = $"Failed to write out PDF file: {ex.Message}";
+                }
+
                 onPrintComplete?.Invoke(printResult);
             };
 
