@@ -1,4 +1,4 @@
-# Html to PDF using WebView on Windows
+# .NET Html to PDF Conversion using WebView on Windows
 | Library        | Nuget Package          |
 |----------------|----------------|
 | Westwind.WebView.HtmlToPdf | <a href="https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/">![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.svg)</a>  <a href="https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/">![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.svg)</a> |
@@ -104,8 +104,6 @@ var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);
 
 Assert.IsTrue(result.IsSuccess, result.Message);
 Assert.IsNotNull(result.ResultStream); // This is what we're after
-
-Debug.WriteLine($"Stream Length: {result.ResultStream.Length}");
 
 // Copy resultstream to output file so we can display it
 File.Delete(outputFile);
