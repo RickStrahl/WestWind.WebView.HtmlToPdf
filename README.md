@@ -83,7 +83,9 @@ var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
 var outputFile = Path.GetFullPath(@".\test3.pdf");
 File.Delete(outputFile);
 
-var host = new HtmlToPdfHostExtended();
+var host = new HtmlToPdfHostExtended();  // or new HtmlPdfHost()
+
+// optional Pdf/Print settings
 var pdfPrintSettings = new WebViewPrintSettings()
 {                
     // default margins are 0.4F
@@ -91,6 +93,7 @@ var pdfPrintSettings = new WebViewPrintSettings()
     MarginLeft = 0.2f,
     MarginRight = 0.2f,
     MarginTop = 0.4f,
+    
     ScaleFactor = 0.8F 
     ShouldPrintHeaderAndFooter = true,
     HeaderTitle = "Blog Post Title"
