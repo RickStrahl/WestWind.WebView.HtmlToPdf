@@ -1,8 +1,8 @@
 # .NET Html to PDF Conversion using WebView on Windows
 | Library        | Nuget Package          |
 |----------------|----------------|
-| Westwind.WebView.HtmlToPdf | <a href="https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/">![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.svg)</a>  <a href="https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/">![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.svg)</a> |
-| Westwind.WebView.HtmlToPdf.Extended | <a href="https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf.Extended/">![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.Extended.svg)</a>  <a href="https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf.Extended/">![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.Extended.svg)</a> |
+| Westwind.WebView.HtmlToPdf | [![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/) [![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/) |
+| Westwind.WebView.HtmlToPdf.Extended | [![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.Extended.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf.Extended/)  [![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.Extended.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf.Extended/) |
 
  > Please note this is a very new project and there's significant churn at the moment. While below v1.0 semantic versioning is not used and there may be significant breaking changes between minor versions.
 
