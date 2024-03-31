@@ -20,14 +20,12 @@ namespace Westwind.WebView.HtmlToPdf
     public class HtmlToPdfHost
     {        
         internal WebViewPrintSettings WebViewPrintSettings = new WebViewPrintSettings();
-        
+        internal TaskCompletionSource<bool> IsCompleteTaskCompletionSource { get; set; } = new TaskCompletionSource<bool>();
 
         /// <summary>
         /// A flag you can check to see if the conversion process has completed.
         /// </summary>
         public bool IsComplete { get; set; }
-
-        internal TaskCompletionSource<bool> IsCompleteTaskCompletionSource { get; set;  } = new TaskCompletionSource<bool>();
 
         /// <summary>
         /// The location of the WebView environment folder that is required
@@ -38,12 +36,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// https://weblog.west-wind.com/posts/2023/Oct/31/Caching-your-WebView-Environment-to-manage-multiple-WebView2-Controls
         /// </summary>
         public string WebViewEnvironmentPath { get; set; } = Path.Combine(Path.GetTempPath(), "WebView2_Environment");
-
-        /// <summary>
-        /// Max Render Timeout for PDF output generation
-        /// </summary>
-        public int RenderTimeoutMs { get; set; } = 10000;
-
+                
         /// <summary>
         /// This method prints a PDF from an HTML URl or File to PDF and awaits
         /// the result to be returned. Result is returned as a Memory Stream in
@@ -167,6 +160,8 @@ namespace Westwind.WebView.HtmlToPdf
                     try
                     {
                         IsComplete = false;
+                        IsCompleteTaskCompletionSource = new TaskCompletionSource<bool>();
+
                         var host = new CoreWebViewHeadlessHost(this);
                         await host.PrintFromUrl(url, outputFile);
 
@@ -251,16 +246,12 @@ namespace Westwind.WebView.HtmlToPdf
                     try
                     {
                         IsComplete = false;
+                        IsCompleteTaskCompletionSource = new TaskCompletionSource<bool>();
 
                         var host = new CoreWebViewHeadlessHost(this);
                         await host.PrintFromUrlStream(url);
 
-                        for (int i = 0; i < RenderTimeoutMs / 20; i++)
-                        {
-                            if (host.IsComplete)
-                                break;
-                            await Task.Delay(20);
-                        }
+                        await IsCompleteTaskCompletionSource.Task;
 
                         if (!host.IsComplete)
                         {
@@ -280,9 +271,7 @@ namespace Westwind.WebView.HtmlToPdf
                                 LastException = host.LastException
                             };
                         }
-
-                        onPrintComplete?.Invoke(result);
-                        
+                        onPrintComplete?.Invoke(result);                        
                     }
                     catch (Exception ex)
                     {
@@ -342,6 +331,8 @@ namespace Westwind.WebView.HtmlToPdf
                     try
                     {
                         IsComplete = false;
+                        IsCompleteTaskCompletionSource = new TaskCompletionSource<bool>();
+
                         var host = new CoreWebViewHeadlessHost(this);
                         await host.PrintFromUrl(url, outputFile);
 
@@ -364,7 +355,6 @@ namespace Westwind.WebView.HtmlToPdf
                                 LastException = host.LastException
                             };
                         }
-
                         onPrintComplete?.Invoke(result);                        
                     }
                     catch (Exception ex)
@@ -385,17 +375,5 @@ namespace Westwind.WebView.HtmlToPdf
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();          
         }
-
-
-        //private async Task WaitForHostComplete(CoreWebViewHeadlessHost host)
-        //{
-        //    for (int i = 0; i < RenderTimeoutMs / 20; i++)
-        //    {
-        //        if (host.IsComplete)
-        //            break;
-        //        await Task.Delay(10);
-        //    }
-        //}
-
     }
 }

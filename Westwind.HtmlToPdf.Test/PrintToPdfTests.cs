@@ -13,42 +13,6 @@ namespace Westwind.PdfToHtml.Test
     public class PrintToPdfTests
     {
 
-        /// <summary>
-        /// Async Result Operation - to stream      
-        /// </summary>        
-        [TestMethod]
-        public async Task PrintToPdfStreamAsyncTest()
-        {
-            var outputFile = Path.GetFullPath(@".\test3.pdf");
-            var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
-
-            File.Delete(outputFile);
-
-            var host = new HtmlToPdfHost();
-            var pdfPrintSettings = new WebViewPrintSettings()
-            {
-                ShouldPrintHeaderAndFooter = true,
-                HeaderTitle = "Blog Post Title"
-            };
-
-            // We're interested in result.ResultStream
-            var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);
-
-            Assert.IsTrue(result.IsSuccess, result.Message);
-            Assert.IsNotNull(result.ResultStream); // THIS
-
-            Debug.WriteLine($"Stream Length: {result.ResultStream.Length}");
-
-            // Copy resultstream to output file
-            File.Delete(outputFile);
-            using (var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                result.ResultStream.CopyTo(fstream);
-                result.ResultStream.Close(); // Close returned stream!
-
-                ShellUtils.OpenUrl(outputFile);
-            }
-        }
 
         /// <summary>
         /// Async Result operation - to file
@@ -88,6 +52,38 @@ namespace Westwind.PdfToHtml.Test
 
 
 
+        /// <summary>
+        /// Async Result Operation - to stream      
+        /// </summary>        
+        [TestMethod]
+        public async Task PrintToPdfStreamAsyncTest()
+        {
+            var outputFile = Path.GetFullPath(@".\test3.pdf");
+            var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+
+            var host = new HtmlToPdfHost();
+            var pdfPrintSettings = new WebViewPrintSettings()
+            {
+                ShouldPrintHeaderAndFooter = true,
+                HeaderTitle = "Blog Post Title"
+            };
+
+            // We're interested in result.ResultStream
+            var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);
+
+            Assert.IsTrue(result.IsSuccess, result.Message);
+            Assert.IsNotNull(result.ResultStream); // THIS
+
+            // Copy resultstream to output file
+            File.Delete(outputFile);
+            using (var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                result.ResultStream.CopyTo(fstream);
+                result.ResultStream.Close(); // Close returned stream!
+
+                ShellUtils.OpenUrl(outputFile);
+            }
+        }
 
         /// <summary>
         /// Event callback on completion - to stream (in-memory)
@@ -102,6 +98,8 @@ namespace Westwind.PdfToHtml.Test
             // File or URL
             var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
 
+            var tcs = new TaskCompletionSource<bool>();
+
             var host = new HtmlToPdfHost();
             Action<PdfPrintResult> onPrintComplete = (result) =>
             {
@@ -115,16 +113,17 @@ namespace Westwind.PdfToHtml.Test
                     {
                         result.ResultStream.CopyTo(fstream);
 
-                        result.ResultStream.Close(); // Close returned stream!
-
-                        ShellUtils.OpenUrl(outputFile);
+                        result.ResultStream.Close(); // Close returned stream!                        
                         Assert.IsTrue(true);
+                        ShellUtils.OpenUrl(outputFile);
                     }
                 }
                 else
                 {
                     Assert.Fail(result.Message);
                 }
+
+                tcs.SetResult(true); 
             };
             var pdfPrintSettings = new WebViewPrintSettings()
             {
@@ -138,15 +137,7 @@ namespace Westwind.PdfToHtml.Test
             };
             host.PrintToPdfStream(htmlFile, onPrintComplete, pdfPrintSettings) ;
 
-            for (int i = 0; i < 50; i++)
-            {
-                if (host.IsComplete)
-                    return;
-
-                await Task.Delay(100);
-            }
-
-            Assert.Fail("Document did not complete in time.");
+            await tcs.Task;
         }
 
         /// <summary>
@@ -165,32 +156,28 @@ namespace Westwind.PdfToHtml.Test
             var outputFile = Path.GetFullPath(@".\test.pdf");
             File.Delete(outputFile);
 
+            var tcs = new TaskCompletionSource<bool>();
+
             var host = new HtmlToPdfHost();           
             
             Action<PdfPrintResult> onPrintComplete = (result) =>
             {
                 if (result.IsSuccess)
-                {
-                    ShellUtils.OpenUrl(outputFile);
+                {                   
                     Assert.IsTrue(true);
+                    ShellUtils.OpenUrl(outputFile);
                 }
                 else
                 {
                     Assert.Fail(result.Message);
                 }
+
+                tcs.SetResult(true);
             };
             host.PrintToPdf(htmlFile,  outputFile, onPrintComplete);
 
-            // have to wait for completion of event callback
-            for (int i = 0; i < 50; i++)
-            {
-                if (host.IsComplete)
-                    return;
-
-                await Task.Delay(100);
-            }
-
-            Assert.Fail("Document did not complete in time.");
+            // wait for completion
+            await tcs.Task;
         }
 
 

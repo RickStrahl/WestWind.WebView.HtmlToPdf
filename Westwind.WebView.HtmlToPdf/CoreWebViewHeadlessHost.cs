@@ -63,6 +63,7 @@ namespace Westwind.WebView.HtmlToPdf
             WebView = controller.CoreWebView2;                        
             WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
 
+            // Ensure that control is initialized before we can navigate!
             IsInitializedTaskCompletionSource.SetResult(true);            
         }
 
@@ -90,6 +91,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// <returns></returns>
         public async Task PrintFromUrlStream(string url)
         {
+            // Can't navigate until initialized
             await IsInitializedTaskCompletionSource.Task;
 
             PdfPrintOutputMode = PdfPrintOutputModes.Stream;
