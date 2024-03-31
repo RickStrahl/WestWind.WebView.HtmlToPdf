@@ -88,8 +88,7 @@ namespace Westwind.WebView.HtmlToPdf
                         await host.PrintFromUrlStream(url);
 
                         await IsCompleteTaskCompletionSource.Task;  
-                        //await WaitForHostComplete(host);                        
-
+              
                         if (!host.IsComplete)
                         {
                             result = new PdfPrintResult()
@@ -171,7 +170,7 @@ namespace Westwind.WebView.HtmlToPdf
                         var host = new CoreWebViewHeadlessHost(this);
                         await host.PrintFromUrl(url, outputFile);
 
-                        await WaitForHostComplete(host);
+                        await IsCompleteTaskCompletionSource.Task;
 
                         if (!host.IsComplete)
                         {
@@ -346,7 +345,7 @@ namespace Westwind.WebView.HtmlToPdf
                         var host = new CoreWebViewHeadlessHost(this);
                         await host.PrintFromUrl(url, outputFile);
 
-                        await WaitForHostComplete(host);
+                        await IsCompleteTaskCompletionSource.Task;
 
                         if (!host.IsComplete)
                         {
@@ -388,15 +387,15 @@ namespace Westwind.WebView.HtmlToPdf
         }
 
 
-        private async Task WaitForHostComplete(CoreWebViewHeadlessHost host)
-        {
-            for (int i = 0; i < RenderTimeoutMs / 20; i++)
-            {
-                if (host.IsComplete)
-                    break;
-                await Task.Delay(10);
-            }
-        }
+        //private async Task WaitForHostComplete(CoreWebViewHeadlessHost host)
+        //{
+        //    for (int i = 0; i < RenderTimeoutMs / 20; i++)
+        //    {
+        //        if (host.IsComplete)
+        //            break;
+        //        await Task.Delay(10);
+        //    }
+        //}
 
     }
 }
