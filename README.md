@@ -15,6 +15,10 @@ This library provides a quick way to print HTML to PDF on Windows using the WebV
 
 This library uses the built-in **WebView2 Runtime in Windows so it has no external dependencies for your applications** assuming you are running on a recent version of Windows that has the WebView2 Runtime installed.
 
+If you would like to find out more how this library works and how it's build, you can check out this blog post:
+
+* [Programmatic Html to PDF Generation using the WebView2 Control](https://weblog.west-wind.com/posts/2024/Mar/26/Html-to-PDF-Generation-using-the-WebView2-Control)
+
 ## Prerequisites
 The components works with:
 
