@@ -4,7 +4,7 @@
 | Westwind.WebView.HtmlToPdf | [![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/) [![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/) |
 | Westwind.WebView.HtmlToPdf.Extended | [![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.Extended.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf.Extended/)  [![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.Extended.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf.Extended/) |
 
- > Please note this is a very new project and there's significant churn at the moment. While below v1.0 semantic versioning is not used and there may be significant breaking changes between minor versions.
+> Please note this is a very new project and there's significant churn at the moment. While below v1.0 semantic versioning is not used and there may be significant breaking changes between minor versions.
 
 This library provides a quick way to print Html to Pdf on Windows using the WebView control. You can generate Pdf from Html of a Url or file by using a few different mechanisms:
 
@@ -51,12 +51,12 @@ The WebView2 component is dependent on Windows Desktop Runtime libraries and the
 There are two versions of the library:
 
 * **Westwind.WebView.HtmlToPdf**  
-The base Html to Pdf conversion library. This library only has a dependency on the WebView control and provides very fast base Html to Pdf conversion. This library is lean and fast and does just base Pdf conversion.
+The base Html to Pdf conversion library. This library only has a single dependency on the WebView control and provides very fast base Html to Pdf conversion. This library is lean and fast and does just base Pdf conversion.
 
 * **Westwind.WebView.HtmlToPdf.Extended**  
-This library provides all the base features and adds TOC generation and CSS injection (in progress) and document information configuration (in progress). This library has additional dependencies, a larger footprint, and renders considerably slower as it has to parse the incoming URL/file multiple times. 
+This library provides all the base features and adds Table of Contents generation and CSS injection (in progress) and document information configuration (in progress). This library has additional dependencies, a larger footprint, and renders considerably slower as it has to parse the incoming URL/file multiple times. 
 
-You can install either one of these NuGet packages (no need for both!):
+You can install either one of these NuGet packages (no need for both):
 
 ```ps
 dotnet add package westwind.webview.htmltopdf
@@ -64,17 +64,19 @@ dotnet add package westwind.webview.htmltopdf
 dotnet add package westwind.webview.htmltopdf.Extended
 ```
 
-Note the `.Extended` package has a dependency on the base package so no need to include both. Both libraries have identical interfaces via these two top level classes respectively:
+Note the `.Extended` package has a dependency on the base package so no need to include both. Both libraries have the same base interface, other than the top level class name:
 
 * **HtmlToPdfHost**
 * **HtmlToPdfHostExtended**
 
+There are a few additional properties specific to the added functionality of the extended version, but the core processing interface is the same.
+
 There are 4 separate output methods:
 
-* PrintToPdf()  - Prints to file with a Callback
-* PrintToPdfStream() - Prints and returns a `result.ResultStream` in a Callback
-* PrintToPdfAsync() - Runs async to create a Pdf file and waits for completion 
 * PrintToPdfStreamAsync() - Runs async and returns a `result.ResultStream`
+* PrintToPdfAsync() - Runs async and creates a Pdf output file
+* PrintToPdfStream() - Creates a Pdf and returns it via Callbakd in `result.ResultStream` 
+* PrintToPdf()  - Creates a Pdf to file a notifies completion via Callback
 
 All of the methods take a file or Url as input. File names have to be fully qualified with a path. Output to file requires that you provide a filename.
 

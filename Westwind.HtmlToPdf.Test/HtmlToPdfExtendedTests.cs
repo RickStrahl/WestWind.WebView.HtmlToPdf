@@ -50,18 +50,22 @@ namespace Westwind.HtmlToPdf.Test
         [TestMethod]
         public async Task PrintPdfAsyncFromUrlExtendedTest()
         {
+            var outputFile = SamplePdf_Outline.Replace("_1", "_2");
+
             var pdf = new HtmlToPdfHostExtended() { MaxTocOutlineLevel = 3 };
-            var result = await pdf.PrintToPdfAsync(SampleHtml, SamplePdf_Outline);
+            var result = await pdf.PrintToPdfAsync(SampleHtml, outputFile);
 
             Assert.IsTrue(result.IsSuccess,result.Message);
 
-            ShellUtils.OpenUrl(SamplePdf_Outline);
+            ShellUtils.OpenUrl(outputFile);
         }
 
 
         [TestMethod]
         public async Task PrintPdfStreamExtendedTest()
         {
+            var outputFile = SamplePdf_Outline.Replace("_1", "_3");
+
             var pdf = new HtmlToPdfHostExtended();            
             var tcs = new TaskCompletionSource();
 
@@ -69,13 +73,13 @@ namespace Westwind.HtmlToPdf.Test
             {
                 Assert.IsTrue(result.IsSuccess, result.Message);
 
-                File.Delete(SamplePdf_Outline);
-                using (var fstream = new FileStream(SamplePdf_Outline, FileMode.OpenOrCreate, FileAccess.Write))
+                File.Delete(outputFile);
+                using (var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write))
                 {
                     result.ResultStream.CopyTo(fstream);
                 }
                 result.ResultStream.Close(); // Close returned stream!    
-                ShellUtils.OpenUrl(SamplePdf_Outline);
+                ShellUtils.OpenUrl(outputFile);
 
                 tcs.SetResult();
             };        
@@ -92,19 +96,21 @@ namespace Westwind.HtmlToPdf.Test
         [TestMethod]
         public async Task PrintPdfExtendedTest()
         {
+            var outputFile = SamplePdf_Outline.Replace("_1", "_4");
+
             var pdf = new HtmlToPdfHostExtended();
             var tcs = new TaskCompletionSource();
-            File.Delete(SamplePdf_Outline);
+            File.Delete(outputFile);
 
             var onPrintComplete = (PdfPrintResult result) =>
             {
                 Assert.IsTrue(result.IsSuccess, result.Message);
-                ShellUtils.OpenUrl(SamplePdf_Outline);
+                ShellUtils.OpenUrl(outputFile);
 
                 tcs.SetResult();
             };
 
-            pdf.PrintToPdf(SampleHtml, SamplePdf_Outline, onPrintComplete, new WebViewPrintSettings
+            pdf.PrintToPdf(SampleHtml, outputFile, onPrintComplete, new WebViewPrintSettings
             {
                 ScaleFactor = 1F
             });

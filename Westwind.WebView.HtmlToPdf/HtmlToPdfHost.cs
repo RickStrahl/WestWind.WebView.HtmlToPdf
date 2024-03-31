@@ -27,6 +27,8 @@ namespace Westwind.WebView.HtmlToPdf
         /// </summary>
         public bool IsComplete { get; set; }
 
+        internal TaskCompletionSource<bool> IsCompleteTaskCompletionSource { get; set;  } = new TaskCompletionSource<bool>();
+
         /// <summary>
         /// The location of the WebView environment folder that is required
         /// for WebView operation. Uses a default in the temp folder but you
@@ -80,10 +82,13 @@ namespace Westwind.WebView.HtmlToPdf
                     try
                     {
                         IsComplete = false;
+                        IsCompleteTaskCompletionSource = new TaskCompletionSource<bool>();
+
                         var host = new CoreWebViewHeadlessHost(this);
                         await host.PrintFromUrlStream(url);
 
-                        await WaitForHostComplete(host);                        
+                        await IsCompleteTaskCompletionSource.Task;  
+                        //await WaitForHostComplete(host);                        
 
                         if (!host.IsComplete)
                         {

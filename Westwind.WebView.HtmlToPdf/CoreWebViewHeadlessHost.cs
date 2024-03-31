@@ -42,7 +42,7 @@ namespace Westwind.WebView.HtmlToPdf
 
         private PdfPrintOutputModes PdfPrintOutputMode { get; set; } = PdfPrintOutputModes.File;
 
-        private bool _IsInitialized = false;
+        protected TaskCompletionSource<bool> IsInitializedTaskCompletionSource = new TaskCompletionSource<bool>(); 
 
         internal CoreWebViewHeadlessHost(HtmlToPdfHost htmlToPdfHost)
         {
@@ -60,10 +60,10 @@ namespace Westwind.WebView.HtmlToPdf
 
             var controller = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE); 
             
-            WebView = controller.CoreWebView2;
-            _IsInitialized = true;
-                        
-            WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;            
+            WebView = controller.CoreWebView2;                        
+            WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
+
+            IsInitializedTaskCompletionSource.SetResult(true);            
         }
 
 
@@ -76,7 +76,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// <returns></returns>
         internal async Task PrintFromUrl(string url, string outputFile)
         {
-            await WaitForInitialized();
+            await IsInitializedTaskCompletionSource.Task;
 
             PdfPrintOutputMode = PdfPrintOutputModes.File;
             _outputFile = outputFile;
@@ -90,7 +90,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// <returns></returns>
         public async Task PrintFromUrlStream(string url)
         {
-            await WaitForInitialized();
+            await IsInitializedTaskCompletionSource.Task;
 
             PdfPrintOutputMode = PdfPrintOutputModes.Stream;
             WebView.Navigate(url);
@@ -109,6 +109,7 @@ namespace Westwind.WebView.HtmlToPdf
             finally
             {
                 IsComplete = true;
+                HtmlToPdfHost.IsCompleteTaskCompletionSource.SetResult(true);
             }
         }
 
@@ -213,14 +214,5 @@ namespace Westwind.WebView.HtmlToPdf
 
             return wvps;
         }
-
-        private async Task WaitForInitialized()
-        {
-            while (!_IsInitialized)
-            {
-                await Task.Delay(2);
-            }
-        }
-
     }
 }
