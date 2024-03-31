@@ -1,4 +1,4 @@
-# .NET Html to PDF Conversion using WebView on Windows
+# .NET Html to Pdf Conversion using WebView on Windows
 | Library        | Nuget Package          |
 |----------------|----------------|
 | Westwind.WebView.HtmlToPdf | [![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/) [![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/) |
@@ -6,27 +6,27 @@
 
  > Please note this is a very new project and there's significant churn at the moment. While below v1.0 semantic versioning is not used and there may be significant breaking changes between minor versions.
 
-This library provides a quick way to print HTML to PDF on Windows using the WebView control. You can generate PDF from HTML using a few different mechanisms:
+This library provides a quick way to print Html to Pdf on Windows using the WebView control. You can generate Pdf from Html of a Url or file by using a few different mechanisms:
 
-* To file
+* To File
 * To Stream
-* Using Async Call
+* Using an Async Call
 * Using Event Callbacks
 
-This library uses the built-in **WebView2 Runtime in Windows so it has no external dependencies for your applications** assuming you are running on a recent version of Windows that has the WebView2 Runtime installed.
+The base library uses the built-in **WebView2 Runtime in Windows so it has no external dependencies for your applications** assuming you are running on a recent version of Windows that has the WebView2 Runtime installed. An extended version provides additional features but requires additional dependencies and is slower to run.
 
-If you would like to find out more how this library works and how it's build, you can check out this blog post:
+If you would like to find out more how this library works and how the original code and Pdf code was build, you can check out this blog post here:
 
-* [Programmatic Html to PDF Generation using the WebView2 Control](https://weblog.west-wind.com/posts/2024/Mar/26/Html-to-PDF-Generation-using-the-WebView2-Control)
+* [Programmatic Html to Pdf Generation using the WebView2 Control](https://weblog.west-wind.com/posts/2024/Mar/26/Html-to-Pdf-Generation-using-the-WebView2-Control)
 
 ## Prerequisites
-The components works with:
+The library is Windows specific, but it works in a variety of environments on Windows.
 
 ### Support for
 * Windows 11/10 Server 2019/2022
 * Desktop Applications
 * Console Applications
-* Service Application
+* Service Applications
 
 The component does not support:
 
@@ -51,7 +51,7 @@ The WebView2 component is dependent on Windows Desktop Runtime libraries and the
 There are two versions of the library:
 
 * **Westwind.WebView.HtmlToPdf**  
-The base Html to PDF conversion library. This library only has a dependency on the WebView control and provides base conversion. This library is lean and fast and does just base PDF conversion.
+The base Html to Pdf conversion library. This library only has a dependency on the WebView control and provides very fast base Html to Pdf conversion. This library is lean and fast and does just base Pdf conversion.
 
 * **Westwind.WebView.HtmlToPdf.Extended**  
 This library provides all the base features and adds TOC generation and CSS injection (in progress) and document information configuration (in progress). This library has additional dependencies, a larger footprint, and renders considerably slower as it has to parse the incoming URL/file multiple times. 
@@ -73,7 +73,7 @@ There are 4 separate output methods:
 
 * PrintToPdf()  - Prints to file with a Callback
 * PrintToPdfStream() - Prints and returns a `result.ResultStream` in a Callback
-* PrintToPdfAsync() - Runs async to create a PDF file and waits for completion 
+* PrintToPdfAsync() - Runs async to create a Pdf file and waits for completion 
 * PrintToPdfStreamAsync() - Runs async and returns a `result.ResultStream`
 
 All of the methods take a file or Url as input. File names have to be fully qualified with a path. Output to file requires that you provide a filename.
@@ -124,7 +124,7 @@ ShellUtils.OpenUrl(outputFile);
 [HttpGet("rawpdf")]
 public async Task<IActionResult> RawPdf()
 {
-    // source file or URL to render to PDF
+    // source file or URL to render to Pdf
     var file = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
 
     var pdf = new HtmlToPdfHostExtended();
@@ -157,11 +157,11 @@ var host = new HtmlToPdfHost(); // or new HtmlToPdfHostExtended()
 var result = await host.PrintToPdfAsync(htmlFile, outputFile);
 
 Assert.IsTrue(result.IsSuccess, result.Message);
-ShellUtils.OpenUrl(outputFile);  // display the PDF file you specified
+ShellUtils.OpenUrl(outputFile);  // display the Pdf file you specified
 ```
 
 
-### Callback Syntax to PDF File
+### Callback Syntax to Pdf File
 
 ```csharp
 var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
