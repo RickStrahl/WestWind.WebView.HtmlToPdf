@@ -1,6 +1,6 @@
 # .NET Html to Pdf Conversion using WebView on Windows
 
-#### *Creating PDF from HTML using WebView2 on Windows with .NET*
+#### *Creating Pdf from Html with .NET on Windows using the WebView2 control*
 
 
 | Library        | Nuget Package          |
@@ -17,7 +17,8 @@ This library provides a quick way to print Html to Pdf on Windows using the WebV
 * Using an Async Call
 * Using Event Callbacks
 
-The base library uses the built-in **WebView2 Runtime in Windows so it has no external dependencies for your applications** assuming you are running on a recent version of Windows that has the WebView2 Runtime installed. An extended version provides additional features but requires additional dependencies and is slower to run.
+The base library uses the built-in **WebView2 Runtime in Windows so it has no external dependencies for your applications** assuming you are running on a recent version of Windows that has the WebView2 Runtime installed. The extended package version provides additional features, but it also has additional dependencies and is slower to run and has a larger distribution footprint. In order to keep the base functionality very small and lean these two packages have been separated.
+
 
 If you would like to find out more how this library works and how the original code and Pdf code was build, you can check out this blog post here:
 
