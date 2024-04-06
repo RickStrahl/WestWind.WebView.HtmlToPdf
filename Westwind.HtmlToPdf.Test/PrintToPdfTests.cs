@@ -32,15 +32,12 @@ namespace Westwind.PdfToHtml.Test
                 MarginTop = 0.3f,
                 MarginBottom = 0.3F,
                 MarginLeft = 0.2f,
-                MarginRight = 0.2f,                
+                MarginRight = 0.2f,
+                
                 ScaleFactor = 0.9F,
-
-                // no effect
-                Copies = 2,
-                PagesPerSide = 4, 
-                ColorMode = WebViewPrintColorModes.Grayscale,
-                Collation = WebViewPrintCollations.UnCollated,
-                 Duplex = WebViewPrintDuplexes.TwoSidedShortEdge
+                //ShouldPrintBackgrounds = false
+                //PageRanges = "1-3,5-8"
+                //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color
             };
 
             // output file is created
@@ -65,7 +62,12 @@ namespace Westwind.PdfToHtml.Test
             var pdfPrintSettings = new WebViewPrintSettings()
             {
                 ShouldPrintHeaderAndFooter = true,
-                HeaderTitle = "Blog Post Title"
+                HeaderTitle = "Blog Post Title",
+
+                ScaleFactor = 0.9F,
+                //ShouldPrintBackgrounds = false
+                //PageRanges = "1-3,5-8"
+                //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color
             };
 
             // We're interested in result.ResultStream
@@ -80,9 +82,8 @@ namespace Westwind.PdfToHtml.Test
             {
                 result.ResultStream.CopyTo(fstream);
                 result.ResultStream.Close(); // Close returned stream!
-
-                ShellUtils.OpenUrl(outputFile);
             }
+            ShellUtils.OpenUrl(outputFile);
         }
 
         /// <summary>
@@ -135,8 +136,11 @@ namespace Westwind.PdfToHtml.Test
                 ScaleFactor = 0.8f,
                 PageRanges = "1,2,5-8"
             };
+            // doesn't wait for completion
             host.PrintToPdfStream(htmlFile, onPrintComplete, pdfPrintSettings) ;
 
+
+            // wait for completion
             await tcs.Task;
         }
 
@@ -174,6 +178,8 @@ namespace Westwind.PdfToHtml.Test
 
                 tcs.SetResult(true);
             };
+
+            // doesn't wait for completion
             host.PrintToPdf(htmlFile,  outputFile, onPrintComplete);
 
             // wait for completion
