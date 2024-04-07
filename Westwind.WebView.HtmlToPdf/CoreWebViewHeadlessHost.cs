@@ -1,6 +1,7 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Westwind.WebView.HtmlToPdf.Utilities;
 
@@ -121,16 +122,25 @@ namespace Westwind.WebView.HtmlToPdf
 
         private async Task InjectCssAndScript()
         {
-            string css = null;
+            var css = new StringBuilder();
+
+            if (HtmlToPdfHost.CssAndScriptOptions.OptimizePdfFonts)
+            {
+                css.AppendLine(OptimizedFontCss);
+            }
             if (HtmlToPdfHost.CssAndScriptOptions.KeepTextTogether)
             {
-                css = PageBreakCss;
+                css.AppendLine(PageBreakCss);
             }
             if (!string.IsNullOrEmpty(HtmlToPdfHost.CssAndScriptOptions.CssToInject))
-                css += "\n" + HtmlToPdfHost.CssAndScriptOptions.CssToInject;
-            if (!string.IsNullOrEmpty(css))
             {
-                var script = "document.head.appendChild(document.createElement('style')).innerHTML = " + StringUtils.ToJsonString(css) + ";";
+                css.AppendLine(HtmlToPdfHost.CssAndScriptOptions.CssToInject);
+            }
+           
+
+            if (css.Length > 0)
+            {
+                var script = "document.head.appendChild(document.createElement('style')).innerHTML = " + StringUtils.ToJsonString(css.ToString()) + ";";
                 await WebView.ExecuteScriptAsync(script);
             }
         }
@@ -239,8 +249,6 @@ namespace Westwind.WebView.HtmlToPdf
 
 
         string PageBreakCss { get; } = @"
-@media print {
-
     html, body {
        text-rendering: optimizeLegibility;
        height: auto;
@@ -266,12 +274,9 @@ namespace Westwind.WebView.HtmlToPdf
     h1, h2, h3, h4, h5, h6 {
        page-break-after: avoid;
        break-after: avoid;
-    }                              
-}
+    }
 ";
         string OptimizedFontCss { get; } = 
-            @"font-family: ""Segoe UI Emoji"", ""Apple Color Emoji"", -apple-system, BlinkMacSystemFont,""Segoe UI"", Helvetica, Helvetica, Arial, sans-serif;";
-    
-
+            @"html, body { font-family: ""Segoe UI Emoji"", ""Apple Color Emoji"", -apple-system, BlinkMacSystemFont,""Segoe UI"", Helvetica, Arial, sans-serif; }";   
         }
     }

@@ -189,7 +189,32 @@ namespace Westwind.PdfToHtml.Test
         }
 
 
+        [TestMethod]
+        public async Task InjectedCssTest()
+        {
+            var outputFile = Path.GetFullPath(@".\test3.pdf");
+            var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
 
+            var host = new HtmlToPdfHost();
+            //host.CssAndScriptOptions.KeepTextTogether = true;
+            host.CssAndScriptOptions.OptimizePdfFonts = true; // force built-in OS fonts (Segoe UI, apple-system, Helvetica) 
+            host.CssAndScriptOptions.CssToInject = "h1 { color: red } h2 { color: green } h3 { color: goldenrod }";
+
+            // We're interested in result.ResultStream
+            var result = await host.PrintToPdfStreamAsync(htmlFile);
+
+            Assert.IsTrue(result.IsSuccess, result.Message);
+            Assert.IsNotNull(result.ResultStream); // THIS
+
+            // Copy resultstream to output file
+            File.Delete(outputFile);
+            using (var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                result.ResultStream.CopyTo(fstream);
+                result.ResultStream.Close(); // Close returned stream!
+            }
+            ShellUtils.OpenUrl(outputFile);
+        }
     }
 
 }
