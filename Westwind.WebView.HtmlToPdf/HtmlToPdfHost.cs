@@ -36,7 +36,14 @@ namespace Westwind.WebView.HtmlToPdf
         /// https://weblog.west-wind.com/posts/2023/Oct/31/Caching-your-WebView-Environment-to-manage-multiple-WebView2-Controls
         /// </summary>
         public string WebViewEnvironmentPath { get; set; } = Path.Combine(Path.GetTempPath(), "WebView2_Environment");
-                
+
+
+        /// <summary>
+        /// Options to inject and optimize CSS for print operations in PDF generation.
+        /// </summary>
+        public PdfCssAndScriptOptions CssAndScriptOptions { get; set; } = new PdfCssAndScriptOptions();
+
+
         /// <summary>
         /// This method prints a PDF from an HTML URl or File to PDF and awaits
         /// the result to be returned. Result is returned as a Memory Stream in
@@ -375,5 +382,49 @@ namespace Westwind.WebView.HtmlToPdf
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();          
         }
+
+
+
+
     }
+
+    public class  PdfCssAndScriptOptions 
+    {
+        /// <summary>
+        /// Injects  @media print CSS that attempts to keep text from breaking across pages by:
+        /// 
+        /// * Minimizing paragraph breaks
+        /// * List breaks
+        /// * Keeping headers and following text together
+        /// * Keeping code blocks from breaking
+        /// 
+        /// Uses page-break and break CSS styles to control page breaks. If you already have 
+        /// @media print style in your HTML source you probably don't need this.
+        /// </summary>
+        public bool KeepTextTogether { get; set; }
+
+        /// <summary>
+        /// Optionally inject custom CSS into the Html document header before printing.
+        /// </summary>
+        public string CssToInject { get; set; }
+
+
+        /// <summary>
+        /// If set to true adds fonts for Windows and Apple native fonts that work best
+        /// for PDF generation using built-in fonts. This can help reduce the size of the
+        /// PDF and also improve rendering for extended characters like emojis.
+        /// 
+        /// Use this if you see invalid characters in your PDF output
+        /// </summary>
+        public bool OptimizePdfFonts { get; set; }
+
+        /// <summary>
+        /// Not implemented yet.
+        /// 
+        /// Optionally inject custom JavaScript that can execute before the page is printed.
+        /// Allows you to potentially modify the page before printing.
+        /// </summary>
+        public string ScriptToInject { get; set; }
+    }
+
 }

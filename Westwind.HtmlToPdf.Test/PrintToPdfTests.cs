@@ -37,8 +37,9 @@ namespace Westwind.PdfToHtml.Test
                 ScaleFactor = 0.9F,
                 //ShouldPrintBackgrounds = false
                 //PageRanges = "1-3,5-8"
-                //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color
+                //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color                
             };
+            //host.CssAndScriptOptions.CssToInject = "h3 { color: green }";
 
             // output file is created
             var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
@@ -68,7 +69,8 @@ namespace Westwind.PdfToHtml.Test
                 //ShouldPrintBackgrounds = false
                 //PageRanges = "1-3,5-8"
                 //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color
-            };
+            };           
+            host.CssAndScriptOptions.KeepTextTogether = true;            
 
             // We're interested in result.ResultStream
             var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);

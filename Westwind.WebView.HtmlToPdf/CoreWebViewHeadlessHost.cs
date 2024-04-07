@@ -2,6 +2,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Westwind.WebView.HtmlToPdf.Utilities;
+
 
 namespace Westwind.WebView.HtmlToPdf
 {
@@ -103,6 +105,8 @@ namespace Westwind.WebView.HtmlToPdf
         {
             try
             {
+                await InjectCssAndScript();
+                
                 if (PdfPrintOutputMode == PdfPrintOutputModes.File)
                     await PrintToPdf();
                 else
@@ -112,6 +116,22 @@ namespace Westwind.WebView.HtmlToPdf
             {
                 IsComplete = true;
                 HtmlToPdfHost.IsCompleteTaskCompletionSource.SetResult(true);
+            }
+        }
+
+        private async Task InjectCssAndScript()
+        {
+            string css = null;
+            if (HtmlToPdfHost.CssAndScriptOptions.KeepTextTogether)
+            {
+                css = PageBreakCss;
+            }
+            if (!string.IsNullOrEmpty(HtmlToPdfHost.CssAndScriptOptions.CssToInject))
+                css += "\n" + HtmlToPdfHost.CssAndScriptOptions.CssToInject;
+            if (!string.IsNullOrEmpty(css))
+            {
+                var script = "document.head.appendChild(document.createElement('style')).innerHTML = " + StringUtils.ToJsonString(css) + ";";
+                await WebView.ExecuteScriptAsync(script);
             }
         }
 
@@ -216,5 +236,42 @@ namespace Westwind.WebView.HtmlToPdf
 
             return wvps;
         }
+
+
+        string PageBreakCss { get; } = @"
+@media print {
+
+    html, body {
+       text-rendering: optimizeLegibility;
+       height: auto;
     }
+
+    pre {
+       white-space: pre-wrap;
+       word-break: normal;
+       word-wrap: normal;
+    }
+    pre > code {
+        white-space: pre-wrap;
+        padding: 1em !important;
+    }
+
+    /* keep paragraphs together */
+    p, li, ul, code, pre {
+       page-break-inside: avoid;
+       break-inside: avoid;
+    }
+
+    /* keep headers and content together */
+    h1, h2, h3, h4, h5, h6 {
+       page-break-after: avoid;
+       break-after: avoid;
+    }                              
 }
+";
+        string OptimizedFontCss { get; } = 
+            @"font-family: ""Segoe UI Emoji"", ""Apple Color Emoji"", -apple-system, BlinkMacSystemFont,""Segoe UI"", Helvetica, Helvetica, Arial, sans-serif;";
+    
+
+        }
+    }

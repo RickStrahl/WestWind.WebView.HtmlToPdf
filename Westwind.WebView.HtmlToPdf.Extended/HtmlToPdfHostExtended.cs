@@ -26,7 +26,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// The maximum TOC nesting level. Corresponds to H1-H6 
         /// values that are picked up for TOC composition.
         /// </summary>
-        public int MaxTocOutlineLevel { get; set; } = 5;
+        public int MaxTocOutlineLevel { get; set; } = 3;
 
         /// <summary>
         /// This method prints a PDF from an HTML URl or File to PDF and awaits
