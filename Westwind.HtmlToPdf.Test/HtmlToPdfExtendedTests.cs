@@ -1,17 +1,7 @@
 ﻿#if !NETFRAMEWORK
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using UglyToad.PdfPig;
-using UglyToad.PdfPig.Content;
-using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
-using UglyToad.PdfPig.Outline;
-using UglyToad.PdfPig.Outline.Destinations;
-using UglyToad.PdfPig.Writer;
 using Westwind.Utilities;
 using Westwind.WebView.HtmlToPdf;
 

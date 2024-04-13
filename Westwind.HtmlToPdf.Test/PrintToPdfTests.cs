@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,8 +11,6 @@ namespace Westwind.PdfToHtml.Test
     [TestClass]
     public class PrintToPdfTests
     {
-
-
         /// <summary>
         /// Async Result operation - to file
         /// </summary>

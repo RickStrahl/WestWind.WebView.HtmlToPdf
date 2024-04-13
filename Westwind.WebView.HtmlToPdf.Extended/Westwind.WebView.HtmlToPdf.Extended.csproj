@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
-		<Version>0.5</Version>
+		<Version>0.6</Version>
 		<TargetFrameworks>net8.0-windows;net6.0-windows;net472</TargetFrameworks>		
 		<UseWindowsForms>True</UseWindowsForms>
 		<Authors>Rick Strahl</Authors>
@@ -9,9 +8,7 @@
 		<Product>West Wind WebView Html To PDF</Product>
 		<Title>Westwind WebView Html to Pdf Extended</Title>
 		<Copyright>(c) West Wind Technologies, 2024</Copyright>
-	</PropertyGroup>
 
-	<PropertyGroup>
 		<DebugType>embedded</DebugType>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageOutputPath>./nupkg</PackageOutputPath>
