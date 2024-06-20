@@ -1,5 +1,6 @@
 ﻿#if !NETFRAMEWORK
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Westwind.Utilities;
@@ -35,6 +36,38 @@ namespace Westwind.HtmlToPdf.Test
             ShellUtils.OpenUrl(SamplePdf_Outline);
         }
 
+        [TestMethod]
+        public async Task PrintPdfStreamAsyncFromStreamExtendedTest()
+        {
+            // Unicode string - make sure to set encoding explicitly!
+
+            //string html = "<html><body><h1>Test</h1><p>what's up</p><h2>Header 2</h2> <p>More Text</p></body></html>";
+            var sampleFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+
+            PdfPrintResult result;
+            using (var stream = new FileStream(sampleFile, FileMode.Open, FileAccess.Read))
+            ///using (var stream = new MemoryStream())
+            {
+                //stream.FromString(html);
+
+                var pdf = new HtmlToPdfHostExtended();
+                result = await pdf.PrintToPdfStreamAsync(stream, new WebViewPrintSettings { ScaleFactor = 1F }, Encoding.UTF8);
+            }
+
+            Assert.IsTrue(result.IsSuccess, result.Message);
+
+            File.Delete(SamplePdf_Outline);
+            using (var fstream = new FileStream(SamplePdf_Outline, FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                result.ResultStream.CopyTo(fstream);
+                result.ResultStream.Close(); // Close returned stream!
+
+                ShellUtils.OpenUrl(SamplePdf_Outline);
+            }
+            Assert.IsNotNull(result, result.Message);
+            ShellUtils.OpenUrl(SamplePdf_Outline);
+        }
+
 
 
         [TestMethod]
@@ -42,7 +75,7 @@ namespace Westwind.HtmlToPdf.Test
         {
             var outputFile = SamplePdf_Outline.Replace("_1", "_2");
 
-            var pdf = new HtmlToPdfHostExtended() { MaxTocOutlineLevel = 3 };
+            var pdf = new HtmlToPdfHostExtended() { MaxTocOutlineLevel = 3 };           
             var result = await pdf.PrintToPdfAsync(SampleHtml, outputFile);
 
             Assert.IsTrue(result.IsSuccess,result.Message);

@@ -101,6 +101,41 @@ namespace Westwind.WebView.HtmlToPdf
             WebView.Navigate(url);
         }
 
+        /// <summary>
+        /// Prints from an HTML stream. This allows HTML to be generated from
+        /// in-memory sources
+        /// </summary>
+        /// <param name="html"></param>
+        /// <returns></returns>
+        public async Task PrintFromHtmlStreamToStream(Stream htmlStream,  Encoding encoding = null)
+        {
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+
+            // Can't navigate until initialized
+            await IsInitializedTaskCompletionSource.Task;
+
+            WebView.Navigate("about:blank");
+
+            PdfPrintOutputMode = PdfPrintOutputModes.Stream;
+            htmlStream.Position = 0;
+            string html = htmlStream.AsString(encoding);                                  
+
+
+            string encodedHtml = StringUtils.ToJsonString(html);
+            string script = "window.document.write(" + encodedHtml + ")";
+
+            try
+            {
+                await WebView.ExecuteScriptAsync(script);
+            }
+            catch(Exception ex)
+            {
+                this.LastException = ex;
+            }
+        }
+
+
 
         private async void CoreWebView2_DOMContentLoaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2DOMContentLoadedEventArgs e)
         {
@@ -177,8 +212,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// <returns></returns>
         internal async Task<Stream> PrintToPdfStream()
         {
-            var webViewPrintSettings = SetWebViewPrintSettings();
-
+            var webViewPrintSettings = SetWebViewPrintSettings();         
             try
             {
                 // we have to turn the stream into something physical because the form won't stay alive

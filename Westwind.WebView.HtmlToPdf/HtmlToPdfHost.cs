@@ -1,6 +1,7 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -42,6 +43,8 @@ namespace Westwind.WebView.HtmlToPdf
         /// Options to inject and optimize CSS for print operations in PDF generation.
         /// </summary>
         public PdfCssAndScriptOptions CssAndScriptOptions { get; set; } = new PdfCssAndScriptOptions();
+
+
 
 
         /// <summary>
@@ -122,6 +125,98 @@ namespace Westwind.WebView.HtmlToPdf
                         Application.ExitThread();  // now kill the event loop and thread
                     }
                 }, null);                
+                Application.Run();  // Windows Event loop needed for WebView in system context!
+            });
+
+            thread.SetApartmentState(ApartmentState.STA); // MUST BE STA!
+            thread.Start();
+
+            return tcs.Task;
+        }
+
+        /// <summary>
+        /// This method prints a PDF from an HTML URl or File to PDF and awaits
+        /// the result to be returned. Result is returned as a Memory Stream in
+        /// result.ResultStream on success. 
+        /// 
+        /// Check result.IsSuccess to check for successful completion.
+        /// </summary>        
+        /// <param name="htmlStream">Stream of an HTML document to print to PDF</param>
+        /// <param name="webViewPrintSettings">WebView PDF generation settings</param>       
+        /// <param name="encoding">Encoding of the HTML stream. Defaults to UTF-8</param>
+        public virtual Task<PdfPrintResult> PrintToPdfStreamAsync(Stream htmlStream,
+            WebViewPrintSettings webViewPrintSettings = null,
+            Encoding encoding = null)
+        {
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+
+            IsComplete = false;
+            WebViewPrintSettings = webViewPrintSettings ?? WebViewPrintSettings;
+
+            PdfPrintResult result = new PdfPrintResult()
+            {
+                IsSuccess = false,
+                Message = "PDF generation didn't complete.",
+            };
+
+            var tcs = new TaskCompletionSource<PdfPrintResult>();
+
+            Thread thread = new Thread(() =>
+            {
+                // Create a Windows Forms Synchronization Context we can execute
+                // which works without a desktop!
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                if (SynchronizationContext.Current == null)
+                {
+                    tcs.SetResult(new PdfPrintResult { IsSuccess = false, Message = "Couldn't create STA Synchronization Context." });
+                    return;
+                }
+                SynchronizationContext.Current.Post(async (state) =>
+                {
+                    try
+                    {
+                        IsComplete = false;
+                        IsCompleteTaskCompletionSource = new TaskCompletionSource<bool>();
+
+                        var host = new CoreWebViewHeadlessHost(this);
+                        await host.PrintFromHtmlStreamToStream(htmlStream, encoding);
+
+                        await IsCompleteTaskCompletionSource.Task;
+
+                        if (!host.IsComplete)
+                        {
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = false,
+                                Message = "Pdf generation timed out or failed to render inside of a non-Desktop context."
+                            };
+                        }
+                        else
+                        {
+                            result = new PdfPrintResult()
+                            {
+                                IsSuccess = host.IsSuccess,
+                                Message = host.IsSuccess ? "PDF was generated." : "PDF generation failed: " + host.LastException?.Message,
+                                ResultStream = host.ResultStream,
+                                LastException = host.LastException
+                            };
+                        }
+                        tcs.SetResult(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = ex.ToString();
+                        result.LastException = ex;
+                        tcs.SetResult(result);
+                    }
+                    finally
+                    {
+                        IsComplete = true;
+                        Application.ExitThread();  // now kill the event loop and thread
+                    }
+                }, null);
                 Application.Run();  // Windows Event loop needed for WebView in system context!
             });
 

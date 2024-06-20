@@ -33,7 +33,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2420.47" />
 		<PackageReference Include="PdfPig" Version="0.1.8" />
 		<PackageReference Include="Westwind.Utilities" Version="4.0.20" />
 	</ItemGroup>

@@ -10,6 +10,7 @@ using UglyToad.PdfPig.Writer;
 using UglyToad.PdfPig;
 using Westwind.Utilities;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
+using System.Text;
 
 namespace Westwind.WebView.HtmlToPdf
 {
@@ -52,6 +53,42 @@ namespace Westwind.WebView.HtmlToPdf
 
             if (headerList.Count > 0)
             {                
+                var bytes = AddTocToPdf(printResult.ResultStream, headerList);
+                var ms = new MemoryStream(bytes);
+                ms.Position = 0;
+                printResult.ResultStream = ms;
+            }
+
+            return printResult;
+        }
+
+        /// <summary>
+        /// This method prints a PDF from an HTML URl or File to PDF and awaits
+        /// the result to be returned. Result is returned as a Memory Stream in
+        /// result.ResultStream on success. 
+        /// 
+        /// Check result.IsSuccess to check for successful completion.
+        /// </summary>
+        /// <param name="url">File or URL to print to PDF</param>        
+        /// <param name="webViewPrintSettings">WebView PDF generation settings</param> 
+        public override async Task<PdfPrintResult> PrintToPdfStreamAsync(Stream htmlStream, WebViewPrintSettings webViewPrintSettings = null, Encoding encoding = null)
+        {
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+
+            // Create the pdf
+            var printResult = await base.PrintToPdfStreamAsync(htmlStream,webViewPrintSettings,encoding);
+            if (!printResult.IsSuccess)
+            {
+                return printResult;
+            }
+
+            IList<HeaderItem> headerList = new List<HeaderItem>();
+            if (GenerateToc)
+                headerList = await CreateTocItems(htmlStream, 6, encoding);
+
+            if (headerList.Count > 0)
+            {
                 var bytes = AddTocToPdf(printResult.ResultStream, headerList);
                 var ms = new MemoryStream(bytes);
                 ms.Position = 0;
@@ -240,6 +277,47 @@ namespace Westwind.WebView.HtmlToPdf
                 
                 var headerItem = new HeaderItem { Level = level, Text = text };
                 headers.Add(headerItem);         
+            }
+
+            headers = BuildHeaderListTree(headers);
+
+            return headers;
+        }
+
+        /// <summary>
+        /// Parse HTML to retrieve H1-H6 elements and creates a list of nested 
+        /// header items.
+        /// </summary>
+        /// <param name="htmlStream">Stream of HTML document</param>
+        /// <param name="maxOutlineLevel"></param>
+        /// <param name="encoding">Encoding for the HTML document - defaults to UTF8</param>
+        /// <returns></returns>
+        private async Task<IList<HeaderItem>> CreateTocItems(Stream htmlStream, int maxOutlineLevel = 6, Encoding encoding = null)
+        {
+            if (encoding == null) 
+                encoding = Encoding.UTF8;
+
+            var list = new List<HeaderItem>();          
+            var doc = new HtmlDocument();
+            doc.Load(htmlStream, encoding);
+
+            var xpath = "//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]";
+            var nodes = doc.DocumentNode.SelectNodes(xpath);
+
+            // nothing to do
+            if (nodes == null)
+                return list;
+
+            var headers = new List<HeaderItem>();
+            foreach (var node in nodes)
+            {
+                var text = node.InnerText.Trim();
+                var textIndent = node.Name.Replace("h", "");
+                if (!int.TryParse(textIndent, out int level) || level > maxOutlineLevel)
+                    continue;
+
+                var headerItem = new HeaderItem { Level = level, Text = text };
+                headers.Add(headerItem);
             }
 
             headers = BuildHeaderListTree(headers);

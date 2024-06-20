@@ -26,10 +26,10 @@ Websurge-Request-Name: Ping Info
 ----- Start WebSurge Options -----
 
 {
-  "SiteBaseUrl": "http://localhost:5063/",
+  "SiteBaseUrl": "http://localhost/PdfWebApp/",
   "RecentSiteBaseUrlList": [
-    "http://localhost:5063/",
-    "http://localhost/PdfWebApp/"
+    "http://localhost/PdfWebApp/",
+    "http://localhost:5063/"
   ],
   "OnlineSessionId": null,
   "SessionVariables": {

@@ -32,6 +32,9 @@ namespace Westwind.PdfToHtml.Test
                 MarginRight = 0.2f,
                 
                 ScaleFactor = 0.9F,
+
+
+                //ShouldPrintHeaderAndFooter = true,   // doesn't work 
                 //ShouldPrintBackgrounds = false
                 //PageRanges = "1-3,5-8"
                 //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color                
