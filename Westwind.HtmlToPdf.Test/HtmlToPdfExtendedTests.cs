@@ -1,4 +1,5 @@
-﻿#if !NETFRAMEWORK
+﻿// #if !NETFRAMEWORK
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,17 +40,17 @@ namespace Westwind.HtmlToPdf.Test
         [TestMethod]
         public async Task PrintPdfStreamAsyncFromStreamExtendedTest()
         {
-            // Unicode string - make sure to set encoding explicitly!
-
-            //string html = "<html><body><h1>Test</h1><p>what's up</p><h2>Header 2</h2> <p>More Text</p></body></html>";
-            var sampleFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
-
             PdfPrintResult result;
-            using (var stream = new FileStream(sampleFile, FileMode.Open, FileAccess.Read))
-            ///using (var stream = new MemoryStream())
-            {
-                //stream.FromString(html);
 
+            // Unicode string - make sure to set encoding explicitly!
+            //string html = "<html><body><h1>Test</h1><p>what's up</p><h2>Header 2</h2> <p>More Text</p></body></html>";
+            //using (var stream = new MemoryStream())
+            //{
+            //   stream.FromString(html);
+
+            var sampleFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+            using (var stream = new FileStream(sampleFile, FileMode.Open, FileAccess.Read))
+            {
                 var pdf = new HtmlToPdfHostExtended();
                 result = await pdf.PrintToPdfStreamAsync(stream, new WebViewPrintSettings { ScaleFactor = 1F }, Encoding.UTF8);
             }
@@ -92,7 +93,7 @@ namespace Westwind.HtmlToPdf.Test
             var pdf = new HtmlToPdfHostExtended();            
             var tcs = new TaskCompletionSource();
 
-            var onPrintComplete = (PdfPrintResult result) =>
+            Action<PdfPrintResult> onPrintComplete = (PdfPrintResult result) =>
             {
                 Assert.IsTrue(result.IsSuccess, result.Message);
 
@@ -115,8 +116,7 @@ namespace Westwind.HtmlToPdf.Test
             await tcs.Task;
         }
 
-
-        [TestMethod]
+         [TestMethod]
         public async Task PrintPdfExtendedTest()
         {
             var outputFile = SamplePdf_Outline.Replace("_1", "_4");
@@ -125,7 +125,7 @@ namespace Westwind.HtmlToPdf.Test
             var tcs = new TaskCompletionSource();
             File.Delete(outputFile);
 
-            var onPrintComplete = (PdfPrintResult result) =>
+            Action<PdfPrintResult> onPrintComplete = (PdfPrintResult result) =>
             {
                 Assert.IsTrue(result.IsSuccess, result.Message);
                 ShellUtils.OpenUrl(outputFile);
@@ -144,5 +144,16 @@ namespace Westwind.HtmlToPdf.Test
 
     }
 
+
+#if NET472
+public class TaskCompletionSource : TaskCompletionSource<string>
+{
+    public void SetResult()
+    {
+        base.SetResult(null);
+    }
 }
+
 #endif
+}
+//#endif

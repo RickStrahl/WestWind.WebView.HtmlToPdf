@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.6</Version>
+		<Version>0.7</Version>
 		<TargetFrameworks>net8.0-windows;net6.0-windows;net472</TargetFrameworks>		
 		<UseWindowsForms>True</UseWindowsForms>
 		<Authors>Rick Strahl</Authors>
