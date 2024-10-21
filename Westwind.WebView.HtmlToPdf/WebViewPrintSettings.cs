@@ -32,33 +32,33 @@
         /// <summary>
         /// Width in inches
         /// </summary>
-        public float PageWidth { get; set; } = 8.5F;
+        public double PageWidth { get; set; } = 8.5F;
 
         /// <summary>
         /// Height in inches
         /// </summary>
-        public float PageHeight { get; set; } = 11F;
+        public double PageHeight { get; set; } = 11F;
 
 
         /// <summary>
         /// Top Margin in inches
         /// </summary>
-        public float MarginTop { get; set; } = 0.25F;
+        public double MarginTop { get; set; } = 0.25F;
 
         /// <summary>
         /// Bottom Margin in inches
         /// </summary>
-        public float MarginBottom { get; set; } = 0.15F;
+        public double MarginBottom { get; set; } = 0.15F;
 
         /// <summary>
         /// Left Margin in inches
         /// </summary>
-        public float MarginLeft { get; set; } = 0.20F;
+        public double MarginLeft { get; set; } = 0.20F;
 
         /// <summary>
         /// Right Margin in inches
         /// </summary>
-        public float MarginRight { get; set; } = 0.20F;
+        public double MarginRight { get; set; } = 0.20F;
 
 
 

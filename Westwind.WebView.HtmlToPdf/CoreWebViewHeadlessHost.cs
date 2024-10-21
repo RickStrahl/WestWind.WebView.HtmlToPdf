@@ -1,5 +1,6 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,8 @@ namespace Westwind.WebView.HtmlToPdf
 
         internal Stream ResultStream { get; set; }
 
+        internal Color Color { get; set; } = Color.White;
+
         /// <summary>
         /// Determines when PDF output generation is complete
         /// </summary>
@@ -50,6 +53,7 @@ namespace Westwind.WebView.HtmlToPdf
         internal CoreWebViewHeadlessHost(HtmlToPdfHost htmlToPdfHost)
         {
             HtmlToPdfHost = htmlToPdfHost;
+            Color = ColorTranslator.FromHtml( htmlToPdfHost.BackgroundHtmlColor ?? "white");
             WebViewPrintSettings = htmlToPdfHost.WebViewPrintSettings;
             InitializeAsync();
         }
@@ -61,9 +65,10 @@ namespace Westwind.WebView.HtmlToPdf
             // must create a data folder if running out of a secured folder that can't write like Program Files
             var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: HtmlToPdfHost.WebViewEnvironmentPath);
 
-            var controller = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE); 
-            
-            WebView = controller.CoreWebView2;                        
+            var controller = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE);
+            controller.DefaultBackgroundColor = Color;
+
+            WebView = controller.CoreWebView2;                     
             WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
 
             // Ensure that control is initialized before we can navigate!
@@ -192,6 +197,7 @@ namespace Westwind.WebView.HtmlToPdf
                 if (File.Exists(_outputFile))
                     File.Delete(_outputFile);
 
+                
                 await WebView.PrintToPdfAsync(_outputFile, webViewPrintSettings);
 
                 if (File.Exists(_outputFile))

@@ -89,7 +89,6 @@ namespace Westwind.HtmlToPdf.Test
         public async Task PrintPdfStreamExtendedTest()
         {
             var outputFile = SamplePdf_Outline.Replace("_1", "_3");
-
             var pdf = new HtmlToPdfHostExtended();            
             var tcs = new TaskCompletionSource();
 
@@ -116,7 +115,8 @@ namespace Westwind.HtmlToPdf.Test
             await tcs.Task;
         }
 
-         [TestMethod]
+
+        [TestMethod]
         public async Task PrintPdfExtendedTest()
         {
             var outputFile = SamplePdf_Outline.Replace("_1", "_4");
@@ -146,14 +146,14 @@ namespace Westwind.HtmlToPdf.Test
 
 
 #if NET472
-public class TaskCompletionSource : TaskCompletionSource<string>
-{
-    public void SetResult()
+    public class TaskCompletionSource : TaskCompletionSource<string>
     {
-        base.SetResult(null);
+        public void SetResult()
+        {
+            base.SetResult(null);
+        }
     }
-}
-
 #endif
+
 }
 //#endif

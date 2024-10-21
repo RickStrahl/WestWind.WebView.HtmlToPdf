@@ -238,7 +238,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// <param name="url"></param>
         /// <param name="maxOutlineLevel"></param>
         /// <returns></returns>
-        private async Task<IList<HeaderItem>> CreateTocItems(string url, int maxOutlineLevel=6)
+        private async Task<List<HeaderItem>> CreateTocItems(string url, int maxOutlineLevel=6)
         {
             var list = new List<HeaderItem>();
             string html = null;
@@ -292,7 +292,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// <param name="maxOutlineLevel"></param>
         /// <param name="encoding">Encoding for the HTML document - defaults to UTF8</param>
         /// <returns></returns>
-        private async Task<IList<HeaderItem>> CreateTocItems(Stream htmlStream, int maxOutlineLevel = 6, Encoding encoding = null)
+        private Task<List<HeaderItem>> CreateTocItems(Stream htmlStream, int maxOutlineLevel = 6, Encoding encoding = null)
         {
             if (encoding == null) 
                 encoding = Encoding.UTF8;
@@ -306,7 +306,7 @@ namespace Westwind.WebView.HtmlToPdf
 
             // nothing to do
             if (nodes == null)
-                return list;
+                return Task.FromResult(list);
 
             var headers = new List<HeaderItem>();
             foreach (var node in nodes)
@@ -322,7 +322,7 @@ namespace Westwind.WebView.HtmlToPdf
 
             headers = BuildHeaderListTree(headers);
 
-            return headers;
+            return Task.FromResult(headers);
         }
 
         /// <summary>

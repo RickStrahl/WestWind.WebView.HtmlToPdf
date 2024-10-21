@@ -1,5 +1,6 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -44,7 +45,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// </summary>
         public PdfCssAndScriptOptions CssAndScriptOptions { get; set; } = new PdfCssAndScriptOptions();
 
-
+        public string BackgroundHtmlColor { get; set; } = "#ffffff";
 
 
         /// <summary>

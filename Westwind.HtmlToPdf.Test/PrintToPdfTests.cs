@@ -16,25 +16,37 @@ namespace Westwind.PdfToHtml.Test
         /// </summary>
         [TestMethod]
         public async Task PrintToPdfFileAsyncTest()
-        {            
+        {
             // File or URL to render
-            var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+            //var url = "file:///C:/temp/TMPLOCAL/_MarkdownMonster_Preview.html";
+            var url = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+
+            var htmlFile = url;
             var outputFile = Path.GetFullPath(@".\test2.pdf");
+
             File.Delete(outputFile);
 
-            var host = new HtmlToPdfHost();
+            var host = new HtmlToPdfHost()
+            {
+                BackgroundHtmlColor = "#ffffff",                
+            };
+            host.CssAndScriptOptions.KeepTextTogether = true;
+
+
             var pdfPrintSettings = new WebViewPrintSettings()
             {
                 // margins are 0.4F default
-                MarginTop = 0.3f,
+                MarginTop = 0.5,
                 MarginBottom = 0.3F,
-                MarginLeft = 0.2f,
-                MarginRight = 0.2f,
+                MarginLeft = 0.4f,
+                MarginRight = 0.4f,
                 
-                ScaleFactor = 0.9F,
+                //ScaleFactor = 0.9F,
 
 
-                //ShouldPrintHeaderAndFooter = true,   // doesn't work 
+                ShouldPrintHeaderAndFooter = true,   // doesn't work 
+                HeaderTitle = "Blog Post Title",
+                FooterUri = "Page 1 of 20",
                 //ShouldPrintBackgrounds = false
                 //PageRanges = "1-3,5-8"
                 //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color                
