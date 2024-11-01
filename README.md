@@ -6,7 +6,7 @@
 | Library        | Nuget Package          |
 |----------------|----------------|
 | Westwind.WebView.HtmlToPdf | [![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/) [![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf/) |
-| Westwind.WebView.HtmlToPdf.Extended | [![](https://img.shields.io/nuget/v/Westwind.WebView.HtmlToPdf.Extended.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf.Extended/)  [![](https://img.shields.io/nuget/dt/Westwind.WebView.HtmlToPdf.Extended.svg)](https://www.nuget.org/packages/Westwind.WebView.HtmlToPdf.Extended/) |
+
 
 > Please note this is a very new project and there's significant churn at the moment. While below v1.0 semantic versioning is not used and there may be significant breaking changes between minor versions.
 
@@ -39,8 +39,8 @@ The component does not support:
 
 ### Targets
 
+* net9.0-windows
 * net8.0-windows
-* net6.0-windows
 * net472
 
 ### Dependencies
@@ -53,35 +53,20 @@ On recent updates of Windows 11 and 10, the WebView is pre-installed as a system
 The WebView2 component is dependent on Windows Desktop Runtime libraries and therefore requires the Desktop runtime to be installed **even for server applications**. 
 
 ## Using the library
-There are two versions of the library:
+This library only has a single dependency on the WebView control and provides very fast base Html to PDF conversion. This library is lean and fast and does just base Pdf conversion.
 
-* **Westwind.WebView.HtmlToPdf**  
-The base Html to Pdf conversion library. This library only has a single dependency on the WebView control and provides very fast base Html to Pdf conversion. This library is lean and fast and does just base Pdf conversion.
-
-* **Westwind.WebView.HtmlToPdf.Extended**  
-This library provides all the base features and adds Table of Contents generation and CSS injection (in progress) and document information configuration (in progress). This library has additional dependencies, a larger footprint, and renders considerably slower as it has to parse the incoming URL/file multiple times. 
-
-You can install either one of these NuGet packages (no need for both):
+You can install this NuGet package:
 
 ```ps
 dotnet add package westwind.webview.htmltopdf
-
-dotnet add package westwind.webview.htmltopdf.Extended
 ```
 
-Note the `.Extended` package has a dependency on the base package so no need to include both. Both libraries have the same base interface, other than the top level class name:
-
-* **HtmlToPdfHost**
-* **HtmlToPdfHostExtended**
-
-There are a few additional properties specific to the added functionality of the extended version, but the core processing interface is the same.
-
-There are 4 separate output methods:
+The library exposes 4 separate output methods:
 
 * PrintToPdfStreamAsync() - Runs async and returns a `result.ResultStream`
-* PrintToPdfAsync() - Runs async and creates a Pdf output file
-* PrintToPdfStream() - Creates a Pdf and returns it via Callbakd in `result.ResultStream` 
-* PrintToPdf()  - Creates a Pdf to file a notifies completion via Callback
+* PrintToPdfAsync() - Runs async and creates a PDF output file
+* PrintToPdfStream() - Creates a PDF and returns it via Callbacks in `result.ResultStream` 
+* PrintToPdf()  - Creates a PDF to file a notifies completion via Callback
 
 All of the methods take a file or Url as input. File names have to be fully qualified with a path. Output to file requires that you provide a filename.
 
@@ -90,38 +75,49 @@ All requests return a `PdfPrintResult` structure which has a `IsSuccess` flag yo
 ### Async Call Syntax for Stream Result
 
 ```cs
-var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
 var outputFile = Path.GetFullPath(@".\test3.pdf");
-File.Delete(outputFile);
+var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
 
-var host = new HtmlToPdfHostExtended();  // or new HtmlPdfHost()
+var host = new HtmlToPdfHost()
+{
+    BackgroundHtmlColor = "#ffffff"
+};
+host.CssAndScriptOptions.KeepTextTogether = true;            
 
-// optional Pdf/Print settings
 var pdfPrintSettings = new WebViewPrintSettings()
-{                
-    // default margins are 0.4F
-    MarginBottom = 0.2F,
-    MarginLeft = 0.2f,
-    MarginRight = 0.2f,
-    MarginTop = 0.4f,
-    
-    ScaleFactor = 0.8F 
+{
+    // margins are 0.4F default
+    MarginTop = 0.5,
+    MarginBottom = 0.3F,
+    ScaleFactor = 0.9F,   // 1 is default
+
     ShouldPrintHeaderAndFooter = true,
-    HeaderTitle = "Blog Post Title"
+    HeaderTitle = "Custom Header (centered)",
+    FooterText = "Custom Footer (lower right)",
+
+    // Optionally customize the header and footer completely - WebView syntax                
+    // HeaderTemplate = "<div style='text-align:center; font-size: 12px;'>" + 
+    //                  "<span class='title'></span></div>",
+    // FooterTemplate = "<div style='text-align:right; margin-right: 2em'>" + 
+    //                  "<span class='pageNumber'></span> of " +
+    //                  "<span class='totalPages'></span></div>",
+
+    GenerateDocumentOutline = true  // default
 };
 
 // We're interested in result.ResultStream
 var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);
 
 Assert.IsTrue(result.IsSuccess, result.Message);
-Assert.IsNotNull(result.ResultStream); // This is what we're after
+Assert.IsNotNull(result.ResultStream); // THIS
 
-// Copy resultstream to output file so we can display it
+// Copy resultstream to output file
 File.Delete(outputFile);
-using var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write);
-result.ResultStream.CopyTo(fstream);
-result.ResultStream.Close(); // Close returned stream!
-
+using (var fstream = new FileStream(outputFile, FileMode.OpenOrCreate, FileAccess.Write))
+{
+    result.ResultStream.CopyTo(fstream);
+    result.ResultStream.Close(); // Close returned stream!
+}
 ShellUtils.OpenUrl(outputFile);
 ```
 
@@ -134,7 +130,7 @@ public async Task<IActionResult> RawPdf()
     // source file or URL to render to Pdf
     var file = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
 
-    var pdf = new HtmlToPdfHostExtended();
+    var pdf = new HtmlToPdfHost();
     var pdfResult = await pdf.PrintToPdfStreamAsync(file, new WebViewPrintSettings {  PageRanges = "1-10"});
 
     if (pdfResult == null || !pdfResult.IsSuccess)
@@ -150,7 +146,6 @@ public async Task<IActionResult> RawPdf()
     return new FileStreamResult(pdfResult.ResultStream, "application/pdf");             
 }
 ```
-
 
 ### Async Call Syntax for File Output
 
@@ -250,6 +245,8 @@ host.PrintToPdfStream(htmlFile, onPrintComplete, pdfPrintSettings);
 The `Task` based methods are easiest to use so that's the recommended syntax. The callback based methods are there so you can more easily use this if you are running in a non-async and can't easily transition to async. 
 
 Both approaches run on a separate STA thread to ensure that the WebView can run regardless of whether you are running inside of an application that has a main UI/STA thread and it works inside of Windows Service contexts.
+
+
 
 ## Support us
 If you use this project and it provides value to you, please consider supporting by contributing or supporting via the sponsor link or one time donation at the top of this page. Value for value.
