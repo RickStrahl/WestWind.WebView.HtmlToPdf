@@ -19,7 +19,9 @@ namespace Westwind.PdfToHtml.Test
         {
             // File or URL to render
             //var url = "file:///C:/temp/TMPLOCAL/_MarkdownMonster_Preview.html";
+            //var url = "C:\\temp\\TestReport.html";
             var url = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+            
 
             var htmlFile = url;
             var outputFile = Path.GetFullPath(@".\test2.pdf");

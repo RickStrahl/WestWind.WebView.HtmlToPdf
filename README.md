@@ -246,6 +246,45 @@ The `Task` based methods are easiest to use so that's the recommended syntax. Th
 
 Both approaches run on a separate STA thread to ensure that the WebView can run regardless of whether you are running inside of an application that has a main UI/STA thread and it works inside of Windows Service contexts.
 
+## FAQ
+
+### Does it work it work in non-Interactive Environments like a Web Application
+Yes, but you have to be careful that you have permissions to retrieve any files you might be rendering.
+
+The following demonstrates running this library in an ASP.NET Core application in IIS using the ANCM using the standard `ApplicationPoolIdentity` account.
+
+![Running Under IIS](Assets/RunningUnderIIS.png)
+
+But as is always the case you have to make sure you have the right permissions to access the files you want to convert and if you're generating to a file that  you have write access. Generally you'll want to generate to stream.
+
+You can look at the [AspNetSample](/AspNetSample) which contains an ASP.NET Core test project that demonstrates Web usage. To see the permissions issues though you have to run IIS using a default or non-interactive account.
+
+To return a PDF as a document in a Controller:
+
+```csharp
+[HttpGet("rawpdf")]
+public async Task<IActionResult> RawPdf()
+{
+    var file = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
+
+    var pdf = new HtmlToPdfHost();
+    var pdfResult = await pdf.PrintToPdfStreamAsync(file, new WebViewPrintSettings {  PageRanges = "1-10"});
+
+    if (pdfResult == null || !pdfResult.IsSuccess)
+    {
+        Response.StatusCode = 500;                
+        return new JsonResult(new
+        {
+            isError = true,
+            message = pdfResult.Message
+        });
+    }
+
+    return new FileStreamResult(pdfResult.ResultStream, "application/pdf");             
+}
+```
+
+In this scenario I'm running **ApplicationPoolIdentity** for the Application Pool and there are no special permissions given
 
 
 ## Support us
