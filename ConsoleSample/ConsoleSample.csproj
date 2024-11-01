@@ -12,8 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Westwind.WebView.HtmlToPdf.Extended\Westwind.WebView.HtmlToPdf.Extended.csproj" />
-    <!--<ProjectReference Include="..\WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj" />-->
+    <ProjectReference Include="..\WestWind.WebView.HtmlToPdf\Westwind.WebView.HtmlToPdf.csproj" />
   </ItemGroup>
 
   <ItemGroup>

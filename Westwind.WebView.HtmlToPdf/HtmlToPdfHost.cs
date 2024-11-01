@@ -227,6 +227,13 @@ namespace Westwind.WebView.HtmlToPdf
             return tcs.Task;
         }
 
+
+    
+        // await WebBrowser.CoreWebView2.CallDevToolsProtocolMethodAsync("Page.printToPdf", "{}");
+
+
+
+
         /// <summary>
         /// This method prints a PDF from an HTML URl or File to PDF and awaits
         /// the result to be returned. Check result.IsSuccess to check for 
@@ -478,10 +485,6 @@ namespace Westwind.WebView.HtmlToPdf
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();          
         }
-
-
-
-
     }
 
     public class  PdfCssAndScriptOptions 
@@ -497,7 +500,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// Uses page-break and break CSS styles to control page breaks. If you already have 
         /// @media print style in your HTML source you probably don't need this.
         /// </summary>
-        public bool KeepTextTogether { get; set; }
+        public bool KeepTextTogether { get; set; } = false;
 
         /// <summary>
         /// Optionally inject custom CSS into the Html document header before printing.

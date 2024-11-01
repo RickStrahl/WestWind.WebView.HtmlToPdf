@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.7.3</Version>
-		<TargetFrameworks>net8.0-windows;net6.0-windows;net472</TargetFrameworks>		
+		<Version>0.10</Version>
+		<TargetFrameworks>net8.0-windows;net6.0-windows;net472</TargetFrameworks>
+		<LangVersion>Latest</LangVersion>
 		<UseWindowsForms>True</UseWindowsForms>
 		<Authors>Rick Strahl</Authors>
 		<Company>West Wind Technologies</Company>
@@ -35,7 +36,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2592.51" />		
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2849.39" />		
 	</ItemGroup>
 
 	<ItemGroup>

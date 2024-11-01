@@ -47,7 +47,7 @@ namespace ConsoleApp1
             File.Delete(outputFile);
 
             // Using the non-extended version of the host (no TOC support)
-            var pdfHost = new HtmlToPdfHostExtended()
+            var pdfHost = new HtmlToPdfHost()
             {
                 WebViewEnvironmentPath = "C:\\temp\\WebViewEnvironment"
             };

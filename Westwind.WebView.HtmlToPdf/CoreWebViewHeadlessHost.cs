@@ -149,7 +149,7 @@ namespace Westwind.WebView.HtmlToPdf
                 await InjectCssAndScript();
                 
                 if (PdfPrintOutputMode == PdfPrintOutputModes.File)
-                    await PrintToPdf();
+                    await PrintToPdf();               
                 else
                     await PrintToPdfStream();
             }
@@ -185,10 +185,14 @@ namespace Westwind.WebView.HtmlToPdf
             }
         }
 
+
+
+        /// <summary>
+        /// Prints PDF to an output file
+        /// </summary>
+        /// <returns></returns>
         internal async Task PrintToPdf()
         {
-            var webViewPrintSettings = SetWebViewPrintSettings();
-
             if (File.Exists(_outputFile))
                 File.Delete(_outputFile);
 
@@ -197,8 +201,36 @@ namespace Westwind.WebView.HtmlToPdf
                 if (File.Exists(_outputFile))
                     File.Delete(_outputFile);
 
-                
-                await WebView.PrintToPdfAsync(_outputFile, webViewPrintSettings);
+                // https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-printToPDF
+                //{
+                //    "landscape": false,    
+                //    "printBackground": true,
+                //    "scale": 1,
+                //    "paperWidth": 8.5,
+                //    "paperHeight": 11,
+                //    "marginTop": 0.50,
+                //    "marginBottom": 0.30,
+                //    "marginLeft": 0.40,
+                //    "marginRight": 0.40,
+                //    "pageRanges": "",  
+                //    "headerTemplate": "<div style='font-size: 11.5px; width: 100%; text-align: center;'><span class='title'></span></div>",
+                //    "footerTemplate": "<div style='font-size: 10px; clear: all; width: 100%; margin-right: 3em; text-align: right; '><span class='pageNumber'></span> of <span class='totalPages'></span></div>",
+                //    "displayHeaderFooter": true,
+                //    "preferCSSPageSize": false,
+                //    "generateDocumentOutline": true
+                //}
+                var json = GetDevToolsWebViewPrintSettingsJson();
+                var pdfBase64 = await  WebView.CallDevToolsProtocolMethodAsync("Page.printToPDF", json);
+
+                if (!string.IsNullOrEmpty(pdfBase64))
+                {
+                    // avoid JSON Serializer Dependency
+                    var b64Data = StringUtils.ExtractString(pdfBase64,"\"data\":\"","\"}");
+                    var pdfData = Convert.FromBase64String(b64Data);
+                    File.WriteAllBytes(_outputFile, pdfData);    // 
+                }
+
+                //await WebView.PrintToPdfAsync(_outputFile, webViewPrintSettings);
 
                 if (File.Exists(_outputFile))
                     IsSuccess = true;
@@ -212,25 +244,33 @@ namespace Westwind.WebView.HtmlToPdf
             }
         }
 
+
         /// <summary>
         /// Prints the current document in the WebView to a MemoryStream
         /// </summary>
         /// <returns></returns>
         internal async Task<Stream> PrintToPdfStream()
-        {
-            var webViewPrintSettings = SetWebViewPrintSettings();         
+        {            
             try
             {
-                // we have to turn the stream into something physical because the form won't stay alive
-                using (var stream = await WebView.PrintToPdfStreamAsync(webViewPrintSettings))
+                var json = GetDevToolsWebViewPrintSettingsJson();
+                var pdfBase64 = await WebView.CallDevToolsProtocolMethodAsync("Page.printToPDF", json);
+
+                if (!string.IsNullOrEmpty(pdfBase64))
                 {
-                    var ms = new MemoryStream();
-                    await stream.CopyToAsync(ms);
-                    ms.Position = 0;
+                    // avoid JSON Serializer Dependency
+                    var b64Data = StringUtils.ExtractString(pdfBase64, "\"data\":\"", "\"}");
+                    var pdfData = Convert.FromBase64String(b64Data);
+
+                    var ms = new MemoryStream(pdfData);
                     ResultStream = ms;
                     IsSuccess = true;
                     return ResultStream;
                 }
+
+                IsSuccess = false;
+                LastException = new InvalidOperationException("No PDF output was generated.");
+                return null;
             }
             catch (Exception ex)
             {
@@ -245,7 +285,7 @@ namespace Westwind.WebView.HtmlToPdf
         /// </summary>
         /// <returns></returns>
 
-        private CoreWebView2PrintSettings SetWebViewPrintSettings()
+        private CoreWebView2PrintSettings GetWebViewPrintSettings()
         {
             var wvps = WebView.Environment.CreatePrintSettings();
 
@@ -266,8 +306,8 @@ namespace Westwind.WebView.HtmlToPdf
             wvps.ShouldPrintBackgrounds = ps.ShouldPrintBackgrounds;
 
             wvps.ShouldPrintHeaderAndFooter = ps.ShouldPrintHeaderAndFooter;
-            wvps.HeaderTitle = ps.HeaderTitle;
-            wvps.FooterUri = ps.FooterUri;
+            wvps.HeaderTitle = ps.HeaderTemplate;
+            wvps.FooterUri = ps.FooterTemplate;
 
             wvps.ShouldPrintSelectionOnly = ps.ShouldPrintSelectionOnly;
             wvps.Orientation = ps.Orientation == WebViewPrintOrientations.Portrait ? CoreWebView2PrintOrientation.Portrait : CoreWebView2PrintOrientation.Landscape;
@@ -286,6 +326,40 @@ namespace Westwind.WebView.HtmlToPdf
 
             return wvps;
         }
+
+
+        /// <summary>
+        /// Map WebViewPrintSettings to DevToolsPrintSettings and return as JSON
+        /// that needs to be passed to the API.
+        /// </summary>
+        /// <returns></returns>
+        public string GetDevToolsWebViewPrintSettingsJson() 
+        {
+            var wvps = new DevToolsPrintToPdfSettings();
+
+            var ps = WebViewPrintSettings;
+
+            wvps.landscape = ps.Orientation == WebViewPrintOrientations.Landscape;
+            wvps.printBackground = ps.ShouldPrintBackgrounds;
+            wvps.scale = ps.ScaleFactor;
+            wvps.paperWidth = ps.PageWidth;
+            wvps.paperHeight = ps.PageHeight;
+            wvps.marginTop = ps.MarginTop;
+            wvps.marginBottom = ps.MarginBottom;
+            wvps.marginLeft = ps.MarginLeft;
+            wvps.marginRight = ps.MarginRight;
+
+            wvps.pageRanges = ps.PageRanges;
+
+            wvps.displayHeaderFooter = ps.ShouldPrintHeaderAndFooter;
+            wvps.headerTemplate = ps.HeaderTemplate;
+            wvps.footerTemplate = ps.FooterTemplate;
+
+            wvps.generateDocumentOutline = ps.GenerateDocumentOutline;
+
+            return wvps.ToJson();
+        }
+        
 
 
         string PageBreakCss { get; } = @"
@@ -320,3 +394,57 @@ namespace Westwind.WebView.HtmlToPdf
             @"html, body { font-family: ""Segoe UI Emoji"", ""Apple Color Emoji"", -apple-system, BlinkMacSystemFont,""Segoe UI"", Helvetica, Arial, sans-serif; }";   
         }
     }
+
+
+public class DevToolsPrintToPdfSettings
+{
+    public bool landscape { get; set; } = false;
+    
+    public bool printBackground { get; set; } = true;
+    
+    public double scale { get; set; } = 1;
+    public double paperWidth { get; set; } = 8.5;
+    public double paperHeight { get; set; } = 11;
+    public double marginTop { get; set; } = 0.4;
+    public double marginBottom { get; set; } = 0.4;
+    public double marginLeft { get; set; } = 0.4;
+    public double marginRight { get; set; } = 0.4;
+    public string pageRanges { get; set; } = "1-5";
+
+    public bool displayHeaderFooter { get; set; } = true;
+    public string headerTemplate { get; set; } = "<div style='font-size: 10px; width: 100%; text-align: center;'><span class='title'></span></div>";
+    public string footerTemplate { get; set; } = "<div style='font-size: 9px; width: 100%; text-align: right;'><span class='pageNumber'></span> of <span class='pageTotal'></span>";
+
+    public bool preferCSSPageSize { get; set; } = false;
+    public bool generateDocumentOutline { get; set; } = true;
+
+    public string ToJson()
+    {
+        // avoid using a serializer
+        return
+$$"""
+{      			
+    "landscape": {{landscape}},    
+    "printBackground": {{printBackground}},
+    "scale": {{scale}},
+    "paperWidth": {{paperWidth}},
+    "paperHeight": {{paperHeight}},
+    "marginTop": {{marginTop:n2}},
+    "marginBottom": {{marginBottom:n2}},
+    "marginLeft": {{marginLeft:n2}},
+    "marginRight": {{marginRight:n2}},
+    "pageRanges": "{{pageRanges:n2}}",  
+    "headerTemplate": {{StringUtils.ToJsonString(headerTemplate)}},
+    "footerTemplate": {{StringUtils.ToJsonString(footerTemplate)}},
+    "displayHeaderFooter": {{displayHeaderFooter}},
+    "preferCSSPageSize": {{preferCSSPageSize}},
+    "generateDocumentOutline": {{generateDocumentOutline}}                 
+}			 
+"""
+                .Trim()
+                .Replace(": True", ": true")
+                .Replace(": False", ": false");
+
+    }
+}
+        

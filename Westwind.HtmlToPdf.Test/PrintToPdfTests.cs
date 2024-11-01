@@ -28,31 +28,30 @@ namespace Westwind.PdfToHtml.Test
 
             var host = new HtmlToPdfHost()
             {
-                BackgroundHtmlColor = "#ffffff",                
-            };
+                BackgroundHtmlColor = "#ffffff"             
+            };            
             host.CssAndScriptOptions.KeepTextTogether = true;
-
+            host.CssAndScriptOptions.CssToInject = "h1 { color: red } h2 { color: green } h3 { color: goldenrod }";
 
             var pdfPrintSettings = new WebViewPrintSettings()
             {
                 // margins are 0.4F default
                 MarginTop = 0.5,
                 MarginBottom = 0.3F,
-                MarginLeft = 0.4f,
-                MarginRight = 0.4f,
-                
                 //ScaleFactor = 0.9F,
 
+                ShouldPrintHeaderAndFooter = true,
+                HeaderTitle = "Custom Header (centered)",
+                FooterText = "Custom Footer (lower right)",
+                
+                // Optionally customize the header and footer completely - WebView syntax                
+                // HeaderTemplate = "<div style='text-align:center; font-size: 12px;'><span class='title'></span></div>",
+                // FooterTemplate = "<div style='text-align:right; margin-right: 2em'><span class='pageNumber'></span> of " +
+                //                  "<span class='totalPages'></span></div>",
 
-                ShouldPrintHeaderAndFooter = true,   // doesn't work 
-                HeaderTitle = "Blog Post Title",
-                FooterUri = "Page 1 of 20",
-                //ShouldPrintBackgrounds = false
-                //PageRanges = "1-3,5-8"
-                //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color                
+                GenerateDocumentOutline = true  // default
             };
-            //host.CssAndScriptOptions.CssToInject = "h3 { color: green }";
-
+   
             // output file is created
             var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
 
@@ -71,18 +70,30 @@ namespace Westwind.PdfToHtml.Test
             var outputFile = Path.GetFullPath(@".\test3.pdf");
             var htmlFile = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
 
-            var host = new HtmlToPdfHost();
+            var host = new HtmlToPdfHost()
+            {
+                BackgroundHtmlColor = "#ffffff"
+            };
+            host.CssAndScriptOptions.KeepTextTogether = true;            
+
             var pdfPrintSettings = new WebViewPrintSettings()
             {
-                ShouldPrintHeaderAndFooter = true,
-                HeaderTitle = "Blog Post Title",
+                // margins are 0.4F default
+                MarginTop = 0.5,
+                MarginBottom = 0.3F,
+                ScaleFactor = 0.9F,   // 1 is default
 
-                ScaleFactor = 0.9F,
-                //ShouldPrintBackgrounds = false
-                //PageRanges = "1-3,5-8"
-                //ColorMode = WebViewColorMode.Monochrome // this is broken in WebView - always color
-            };           
-            host.CssAndScriptOptions.KeepTextTogether = true;            
+                ShouldPrintHeaderAndFooter = true,
+                HeaderTitle = "Custom Header (centered)",
+                FooterText = "Custom Footer (lower right)",
+
+                // Optionally customize the header and footer completely - WebView syntax                
+                // HeaderTemplate = "<div style='text-align:center; font-size: 12px;'><span class='title'></span></div>",
+                // FooterTemplate = "<div style='text-align:right; margin-right: 2em'><span class='pageNumber'></span> of " +
+                //                  "<span class='totalPages'></span></div>",
+
+                GenerateDocumentOutline = true  // default
+            };
 
             // We're interested in result.ResultStream
             var result = await host.PrintToPdfStreamAsync(htmlFile, pdfPrintSettings);

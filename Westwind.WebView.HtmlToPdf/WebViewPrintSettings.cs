@@ -1,10 +1,15 @@
-﻿namespace Westwind.WebView.HtmlToPdf
+﻿using Microsoft.Web.WebView2.Core;
+
+namespace Westwind.WebView.HtmlToPdf
 {
 
     /// <summary>
     /// Proxy object of Core WebView settings options to avoid requiring
     /// a direct reference to the WebView control in the calling
     /// application/project.
+    /// 
+    /// Settings map to these specific settings in the WebView:
+    /// https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-printToPDF
     /// </summary>
     public class WebViewPrintSettings
     {
@@ -93,18 +98,54 @@
         /// </summary>
         public bool ShouldPrintHeaderAndFooter { get; set; } = false;
 
+        
+        public bool GenerateDocumentOutline { get; set; } = true;
+
+
         /// <summary>
-        /// Title displayed on every page as a thin header - only displayed if ShouldPrintHeaderAndFooter is true
+        /// Html Template that renders the header.
+        /// Refer to for embeddable styles and formatting:
+        /// https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-printToPDF
         /// </summary>
-        public string HeaderTitle { get; set; }
+        public string HeaderTemplate { get; set; } = "<div style='font-size: 11.5px; width: 100%; text-align: center;'><span class='title'></span></div>";
+
 
         /// <summary>
-        /// Url displayed on footer - only displayed if ShouldPrintHeaderAndFooter is set
+        /// Html template that renders the footer
+        /// Refer to for embeddable styles and formatting:
+        /// https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-printToPDF
         /// </summary>
-        public string FooterUri { get; set; }
+        public string FooterTemplate { get; set; } = "<div style='font-size: 10px; clear: all; width: 100%; margin-right: 3em; text-align: right; '><span class='pageNumber'></span> of <span class='totalPages'></span></div>";
 
 
 
+        /// <summary>
+        /// This a shortcut for the HeaderTemplate that sets the top of the page header. For more control
+        /// set the HeaderTemplate directly.
+        /// </summary>
+        public string HeaderTitle { set
+            {
+                if (string.IsNullOrEmpty(value))
+                    HeaderTemplate = "";
+                else
+                    HeaderTemplate = $"<div style='font-size: 11.5px; width: 100%; text-align: center;'>{value}</div>";
+            }
+        }
+
+        /// <summary>
+        /// This a shortcut for the FooterTemplate that sets the bottom of the page footer. For more control
+        /// set the FooterTemplate directly.        
+        /// </summary>
+        public string FooterText
+        {
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    FooterTemplate = "";
+                else
+                    FooterTemplate = $"<div style='font-size: 10px; margin-right: 2em; width: 100%; text-align: right; '>{value}</div>";
+            }
+        }
 
         #region Print Settings - ignored for PDF
 

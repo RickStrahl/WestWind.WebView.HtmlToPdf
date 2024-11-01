@@ -52,7 +52,7 @@ namespace WebApplication1
         {
             var file = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
 
-            var pdf = new HtmlToPdfHostExtended();
+            var pdf = new HtmlToPdfHost();
             var pdfResult = await pdf.PrintToPdfStreamAsync(file, new WebViewPrintSettings {  PageRanges = "1-10"});
 
             if (pdfResult == null || !pdfResult.IsSuccess)
@@ -78,7 +78,7 @@ namespace WebApplication1
             if (string.IsNullOrEmpty(url))
                 url = Path.GetFullPath("./HtmlSampleFile-SelfContained.html");
 
-            var pdf = new HtmlToPdfHostExtended();
+            var pdf = new HtmlToPdfHost();
             var pdfResult = await pdf.PrintToPdfStreamAsync(url, new WebViewPrintSettings {  });
 
             if (pdfResult == null || !pdfResult.IsSuccess)
