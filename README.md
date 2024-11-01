@@ -22,7 +22,7 @@ The base library uses the built-in **WebView2 Runtime in Windows so it has no ex
 
 If you would like to find out more how this library works and how the original code and Pdf code was build, you can check out this blog post here:
 
-* [Programmatic Html to Pdf Generation using the WebView2 Control](https://weblog.west-wind.com/posts/2024/Mar/26/Html-to-Pdf-Generation-using-the-WebView2-Control)
+* [Programmatic Html to Pdf Generation using the WebView2 Control](https://weblog.west-wind.com/posts/2024/Mar/26/Programmatic-Html-to-PDF-Generation-using-the-WebView2-Control-with-NET)
 
 ## Prerequisites
 The library is Windows specific, but it works in a variety of environments on Windows.
