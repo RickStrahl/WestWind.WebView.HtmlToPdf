@@ -284,7 +284,7 @@ public async Task<IActionResult> RawPdf()
 }
 ```
 
-In this scenario I'm running **ApplicationPoolIdentity** for the Application Pool and there are no special permissions given
+In this scenario I'm running **ApplicationPoolIdentity** for the Application Pool and there are no special permissions given.
 
 
 ## Support us

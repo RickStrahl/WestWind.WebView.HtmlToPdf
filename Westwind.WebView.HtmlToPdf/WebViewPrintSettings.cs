@@ -12,9 +12,7 @@ namespace Westwind.WebView.HtmlToPdf
     /// https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-printToPDF
     /// </summary>
     public class WebViewPrintSettings
-    {
-        private float _scaleFactor = 1F;
-
+    {       
         /// <summary>
         /// Scale Factor up to 2
         /// </summary>
@@ -28,6 +26,8 @@ namespace Westwind.WebView.HtmlToPdf
                     ScaleFactor = 2F;
             }
         }
+        private float _scaleFactor = 1F;
+
 
         /// <summary>
         /// Portrait, Landscape
@@ -48,22 +48,22 @@ namespace Westwind.WebView.HtmlToPdf
         /// <summary>
         /// Top Margin in inches
         /// </summary>
-        public double MarginTop { get; set; } = 0.25F;
+        public double MarginTop { get; set; } = 0.4F;
 
         /// <summary>
         /// Bottom Margin in inches
         /// </summary>
-        public double MarginBottom { get; set; } = 0.15F;
+        public double MarginBottom { get; set; } = 0.30F;
 
         /// <summary>
         /// Left Margin in inches
         /// </summary>
-        public double MarginLeft { get; set; } = 0.20F;
+        public double MarginLeft { get; set; } = 0.25F;
 
         /// <summary>
         /// Right Margin in inches
         /// </summary>
-        public double MarginRight { get; set; } = 0.20F;
+        public double MarginRight { get; set; } = 0.25F;
 
 
 
