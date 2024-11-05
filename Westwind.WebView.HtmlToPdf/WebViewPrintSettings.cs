@@ -66,11 +66,10 @@ namespace Westwind.WebView.HtmlToPdf
         public double MarginRight { get; set; } = 0.25F;
 
 
-
         /// <summary>
         /// Page ranges as specified 1,2,3,5-7
         /// </summary>
-        public string PageRanges { get; set; }
+        public string PageRanges { get; set; } = string.Empty;
 
 
         /// <summary>

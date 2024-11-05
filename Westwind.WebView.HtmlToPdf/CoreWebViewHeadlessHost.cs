@@ -1,5 +1,6 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -29,13 +30,15 @@ namespace Westwind.WebView.HtmlToPdf
         /// </summary>
         internal HtmlToPdfHost HtmlToPdfHost { get; set; }
 
+    
+
         internal bool IsSuccess { get; set; } = false;
 
         internal Exception LastException { get; set; }
 
         internal Stream ResultStream { get; set; }
 
-        internal Color Color { get; set; } = Color.White;
+        //internal Color Color { get; set; } = Color.White;
 
         /// <summary>
         /// Determines when PDF output generation is complete
@@ -53,8 +56,7 @@ namespace Westwind.WebView.HtmlToPdf
 
         internal CoreWebViewHeadlessHost(HtmlToPdfHost htmlToPdfHost)
         {
-            HtmlToPdfHost = htmlToPdfHost;
-            Color = ColorTranslator.FromHtml( htmlToPdfHost.BackgroundHtmlColor ?? "white");
+            HtmlToPdfHost = htmlToPdfHost;            
             WebViewPrintSettings = htmlToPdfHost.WebViewPrintSettings;
             InitializeAsync();
         }
@@ -67,7 +69,7 @@ namespace Westwind.WebView.HtmlToPdf
             var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: HtmlToPdfHost.WebViewEnvironmentPath);
 
             var controller = await environment.CreateCoreWebView2ControllerAsync(HWND_MESSAGE);
-            controller.DefaultBackgroundColor = Color;
+            controller.DefaultBackgroundColor = ColorTranslator.FromHtml(HtmlToPdfHost.BackgroundHtmlColor ?? "white");
 
             WebView = controller.CoreWebView2;                     
             WebView.DOMContentLoaded += CoreWebView2_DOMContentLoaded;
@@ -128,7 +130,7 @@ namespace Westwind.WebView.HtmlToPdf
             string html = htmlStream.AsString(encoding);                                  
 
 
-            string encodedHtml = StringUtils.ToJson(html);
+            string encodedHtml = html.ToJson();
             string script = "window.document.write(" + encodedHtml + ")";
 
             try
@@ -220,7 +222,13 @@ namespace Westwind.WebView.HtmlToPdf
                 //    "preferCSSPageSize": false,
                 //    "generateDocumentOutline": true
                 //}
-                var json = GetDevToolsWebViewPrintSettingsJson();
+
+                if (HtmlToPdfHost.DelayPdfGenerationMs > 0)
+                {
+                    await Task.Delay(HtmlToPdfHost.DelayPdfGenerationMs);
+                }
+
+                var json = GetDevToolsWebViewPrintSettingsJson();       
                 var pdfBase64 = await  WebView.CallDevToolsProtocolMethodAsync("Page.printToPDF", json);
 
                 if (!string.IsNullOrEmpty(pdfBase64))
@@ -245,6 +253,8 @@ namespace Westwind.WebView.HtmlToPdf
             }
         }
 
+        
+
 
         /// <summary>
         /// Prints the current document in the WebView to a MemoryStream
@@ -255,6 +265,7 @@ namespace Westwind.WebView.HtmlToPdf
             try
             {
                 var json = GetDevToolsWebViewPrintSettingsJson();
+                Console.WriteLine(json);
                 var pdfBase64 = await WebView.CallDevToolsProtocolMethodAsync("Page.printToPDF", json);
 
                 if (!string.IsNullOrEmpty(pdfBase64))
@@ -410,7 +421,7 @@ public class DevToolsPrintToPdfSettings
     public double marginBottom { get; set; } = 0.4;
     public double marginLeft { get; set; } = 0.4;
     public double marginRight { get; set; } = 0.4;
-    public string pageRanges { get; set; } = "1-5";
+    public string pageRanges { get; set; } = "";
 
     public bool displayHeaderFooter { get; set; } = true;
     public string headerTemplate { get; set; } = "<div style='font-size: 10px; width: 100%; text-align: center;'><span class='title'></span></div>";
@@ -434,7 +445,7 @@ $$"""
     "marginBottom": {{marginBottom.ToJson()}},
     "marginLeft": {{marginLeft.ToJson()}},
     "marginRight": {{marginRight.ToJson()}},
-    "pageRanges": "{{pageRanges.ToJson()}}",  
+    "pageRanges":  {{(pageRanges ?? string.Empty).ToJson()}},  
     "headerTemplate": {{headerTemplate.ToJson()}},
     "footerTemplate": {{footerTemplate.ToJson()}},
     "displayHeaderFooter": {{displayHeaderFooter.ToJson()}},

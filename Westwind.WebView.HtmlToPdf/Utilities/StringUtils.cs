@@ -72,7 +72,10 @@ namespace Westwind.WebView.HtmlToPdf.Utilities
 
         internal static string ToJson(this double value, int maxDecimals = 2)
         {
-            return value.ToString("n" + maxDecimals, CultureInfo.InvariantCulture);
+            if (maxDecimals > -1)
+                value = Math.Round(value, maxDecimals);
+
+            return value.ToString(CultureInfo.InvariantCulture);
         }
         internal static string ToJson(this bool value)
         {

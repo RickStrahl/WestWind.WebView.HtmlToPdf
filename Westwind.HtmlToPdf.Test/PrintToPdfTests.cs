@@ -245,7 +245,52 @@ namespace Westwind.PdfToHtml.Test
 
 
         [TestMethod]
-        public void SettingsJsonSerializationTests()
+        public async Task PrintToPdfDarkMarginsFileAsyncTest()
+        {
+            // File or URL to render
+            //var url = "file:///C:/temp/TMPLOCAL/_MarkdownMonster_Preview.html";
+            //var url = "C:\\temp\\TestReport.html";
+            var url = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
+
+
+            var htmlFile = url;
+            var outputFile = Path.GetFullPath(@".\test2.pdf");
+
+            File.Delete(outputFile);
+
+            var host = new HtmlToPdfHost()
+            {
+                BackgroundHtmlColor = "#111"
+            };
+            host.CssAndScriptOptions.KeepTextTogether = true;
+
+            var pdfPrintSettings = new WebViewPrintSettings()
+            {
+                // margins are 0.4F default
+                MarginTop = 0.5,
+                MarginBottom = 0.5F,
+                //ScaleFactor = 0.9F,
+
+                // Custom Templates required for dark background so we can set text color
+                ShouldPrintHeaderAndFooter = true,
+                HeaderTemplate = "<div style='text-align:center; width: 100%; font-size: 12px; color: white'><span class='title'></span></div>",
+                FooterTemplate = "<div style='text-align:right; width: 100%; font-size: 10px; color: white; margin-right: 2em;'><span class='pageNumber'></span> of " +
+                                 "<span class='totalPages'></span></div>",
+                
+                            
+                GenerateDocumentOutline = true  // default
+            };
+
+            // output file is created
+            var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
+
+            Assert.IsTrue(result.IsSuccess, result.Message);
+            ShellUtils.OpenUrl(outputFile);  // display it
+        }
+
+
+        [TestMethod]
+        public void SettingsCultureJsonSerializationTests()
         {
             string expectedScale = "1.22";
             // Arrange

@@ -45,7 +45,31 @@ namespace Westwind.WebView.HtmlToPdf
         /// </summary>
         public PdfCssAndScriptOptions CssAndScriptOptions { get; set; } = new PdfCssAndScriptOptions();
 
+
+        /// <summary>
+        /// Specify the background color of the PDF frame which contains
+        /// the margins of the document. 
+        ///
+        /// Defaults to white, but if you use a non-white background for your
+        /// document you'll likely want to match it to your document background.
+        /// 
+        /// Also note that non-white colors may have to use custom HeaderTemplate and 
+        /// FooterTemplate to set the foregraound color of the text to match the background.
+        /// </summary>
         public string BackgroundHtmlColor { get; set; } = "#ffffff";
+
+
+        /// <summary>
+        /// If set delays PDF generation to allow the document to complete loading if 
+        /// content is dynamically loaded. By default PDF generation fires off 
+        /// DomContentLoaded which fires when all embedded resources have loaded,
+        /// but in some cases when resources load very slow, or when resources are dynamically
+        /// loaded you might need to delay the PDF generation to allow the document to
+        /// completely load.
+        /// 
+        /// Specify in milliseconds, default is no delay.
+        /// </summary>
+        public int DelayPdfGenerationMs { get; set; }
 
 
         /// <summary>
