@@ -1,6 +1,7 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -127,7 +128,7 @@ namespace Westwind.WebView.HtmlToPdf
             string html = htmlStream.AsString(encoding);                                  
 
 
-            string encodedHtml = StringUtils.ToJsonString(html);
+            string encodedHtml = StringUtils.ToJson(html);
             string script = "window.document.write(" + encodedHtml + ")";
 
             try
@@ -180,7 +181,7 @@ namespace Westwind.WebView.HtmlToPdf
 
             if (css.Length > 0)
             {
-                var script = "document.head.appendChild(document.createElement('style')).innerHTML = " + StringUtils.ToJsonString(css.ToString()) + ";";
+                var script = "document.head.appendChild(document.createElement('style')).innerHTML = " + StringUtils.ToJson(css.ToString()) + ";";
                 await WebView.ExecuteScriptAsync(script);
             }
         }
@@ -424,26 +425,25 @@ public class DevToolsPrintToPdfSettings
         return
 $$"""
 {      			
-    "landscape": {{landscape}},    
-    "printBackground": {{printBackground}},
-    "scale": {{scale}},
-    "paperWidth": {{paperWidth}},
-    "paperHeight": {{paperHeight}},
-    "marginTop": {{marginTop:n2}},
-    "marginBottom": {{marginBottom:n2}},
-    "marginLeft": {{marginLeft:n2}},
-    "marginRight": {{marginRight:n2}},
-    "pageRanges": "{{pageRanges:n2}}",  
-    "headerTemplate": {{StringUtils.ToJsonString(headerTemplate)}},
-    "footerTemplate": {{StringUtils.ToJsonString(footerTemplate)}},
-    "displayHeaderFooter": {{displayHeaderFooter}},
-    "preferCSSPageSize": {{preferCSSPageSize}},
-    "generateDocumentOutline": {{generateDocumentOutline}}                 
+    "landscape": {{landscape.ToJson()}},    
+    "printBackground": {{printBackground.ToJson()}},
+    "scale": {{scale.ToJson()}},
+    "paperWidth": {{paperWidth.ToJson()}},
+    "paperHeight": {{paperHeight.ToJson()}},
+    "marginTop": {{marginTop.ToJson()}},
+    "marginBottom": {{marginBottom.ToJson()}},
+    "marginLeft": {{marginLeft.ToJson()}},
+    "marginRight": {{marginRight.ToJson()}},
+    "pageRanges": "{{pageRanges.ToJson()}}",  
+    "headerTemplate": {{headerTemplate.ToJson()}},
+    "footerTemplate": {{footerTemplate.ToJson()}},
+    "displayHeaderFooter": {{displayHeaderFooter.ToJson()}},
+    "preferCSSPageSize": {{preferCSSPageSize.ToJson()}},
+    "generateDocumentOutline": {{generateDocumentOutline.ToJson()}}                 
 }			 
 """
-                .Trim()
-                .Replace(": True", ": true")
-                .Replace(": False", ": false");
+                .Trim();
+            
 
     }
 }

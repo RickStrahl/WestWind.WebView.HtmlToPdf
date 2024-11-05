@@ -1,5 +1,7 @@
 using System;
+using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Westwind.Utilities;
@@ -21,7 +23,7 @@ namespace Westwind.PdfToHtml.Test
             //var url = "file:///C:/temp/TMPLOCAL/_MarkdownMonster_Preview.html";
             //var url = "C:\\temp\\TestReport.html";
             var url = Path.GetFullPath("HtmlSampleFileLonger-SelfContained.html");
-            
+
 
             var htmlFile = url;
             var outputFile = Path.GetFullPath(@".\test2.pdf");
@@ -30,8 +32,8 @@ namespace Westwind.PdfToHtml.Test
 
             var host = new HtmlToPdfHost()
             {
-                BackgroundHtmlColor = "#ffffff"             
-            };            
+                BackgroundHtmlColor = "#ffffff"
+            };
             host.CssAndScriptOptions.KeepTextTogether = true;
             host.CssAndScriptOptions.CssToInject = "h1 { color: red } h2 { color: green } h3 { color: goldenrod }";
 
@@ -45,7 +47,7 @@ namespace Westwind.PdfToHtml.Test
                 ShouldPrintHeaderAndFooter = true,
                 HeaderTitle = "Custom Header (centered)",
                 FooterText = "Custom Footer (lower right)",
-                
+
                 // Optionally customize the header and footer completely - WebView syntax                
                 // HeaderTemplate = "<div style='text-align:center; font-size: 12px;'><span class='title'></span></div>",
                 // FooterTemplate = "<div style='text-align:right; margin-right: 2em'><span class='pageNumber'></span> of " +
@@ -53,7 +55,7 @@ namespace Westwind.PdfToHtml.Test
 
                 GenerateDocumentOutline = true  // default
             };
-   
+
             // output file is created
             var result = await host.PrintToPdfAsync(htmlFile, outputFile, pdfPrintSettings);
 
@@ -76,7 +78,7 @@ namespace Westwind.PdfToHtml.Test
             {
                 BackgroundHtmlColor = "#ffffff"
             };
-            host.CssAndScriptOptions.KeepTextTogether = true;            
+            host.CssAndScriptOptions.KeepTextTogether = true;
 
             var pdfPrintSettings = new WebViewPrintSettings()
             {
@@ -151,7 +153,7 @@ namespace Westwind.PdfToHtml.Test
                     Assert.Fail(result.Message);
                 }
 
-                tcs.SetResult(true); 
+                tcs.SetResult(true);
             };
             var pdfPrintSettings = new WebViewPrintSettings()
             {
@@ -164,7 +166,7 @@ namespace Westwind.PdfToHtml.Test
                 PageRanges = "1,2,5-8"
             };
             // doesn't wait for completion
-            host.PrintToPdfStream(htmlFile, onPrintComplete, pdfPrintSettings) ;
+            host.PrintToPdfStream(htmlFile, onPrintComplete, pdfPrintSettings);
 
 
             // wait for completion
@@ -180,7 +182,7 @@ namespace Westwind.PdfToHtml.Test
         /// </remarks>
         [TestMethod]
         public async Task PrintToPdfFileTest()
-        {        
+        {
             // File or URL
             var htmlFile = Path.GetFullPath("HtmlSampleFile-SelfContained.html");
             // Full Path to output file
@@ -189,12 +191,12 @@ namespace Westwind.PdfToHtml.Test
 
             var tcs = new TaskCompletionSource<bool>();
 
-            var host = new HtmlToPdfHost();           
-            
+            var host = new HtmlToPdfHost();
+
             Action<PdfPrintResult> onPrintComplete = (result) =>
             {
                 if (result.IsSuccess)
-                {                   
+                {
                     Assert.IsTrue(true);
                     ShellUtils.OpenUrl(outputFile);
                 }
@@ -207,7 +209,7 @@ namespace Westwind.PdfToHtml.Test
             };
 
             // doesn't wait for completion
-            host.PrintToPdf(htmlFile,  outputFile, onPrintComplete);
+            host.PrintToPdf(htmlFile, outputFile, onPrintComplete);
 
             // wait for completion
             await tcs.Task;
@@ -240,6 +242,28 @@ namespace Westwind.PdfToHtml.Test
             }
             ShellUtils.OpenUrl(outputFile);
         }
-    }
 
+
+        [TestMethod]
+        public void SettingsJsonSerializationTests()
+        {
+            string expectedScale = "1.22";
+            // Arrange
+            var settings = new DevToolsPrintToPdfSettings
+            {
+                scale = 1.22,                
+
+            };
+            CultureInfo.CurrentCulture = new CultureInfo("de-de");
+
+            // Act
+            var json = settings.ToJson();
+
+            Console.WriteLine(json);
+
+            // Assert
+            Assert.IsTrue(json.Contains($"\"scale\": {expectedScale}"));            
+        }
+
+    }
 }

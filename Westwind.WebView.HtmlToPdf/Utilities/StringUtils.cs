@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 
 namespace Westwind.WebView.HtmlToPdf.Utilities
@@ -15,7 +16,7 @@ namespace Westwind.WebView.HtmlToPdf.Utilities
         /// </summary>
         /// <param name="text"></param>
         /// <returns>JSON encoded string ("text"), empty ("") or "null".</returns>
-        internal static string ToJsonString(string text, bool noQuotes = false)
+        internal static string ToJson(this string text, bool noQuotes = false)
         {
             if (text is null)
                 return "null";
@@ -67,6 +68,15 @@ namespace Westwind.WebView.HtmlToPdf.Utilities
                 sb.Append("\"");
 
             return sb.ToString();
+        }
+
+        internal static string ToJson(this double value, int maxDecimals = 2)
+        {
+            return value.ToString("n" + maxDecimals, CultureInfo.InvariantCulture);
+        }
+        internal static string ToJson(this bool value)
+        {
+            return value ? "true" : "false";
         }
 
         internal static string ExtractString(string source,
