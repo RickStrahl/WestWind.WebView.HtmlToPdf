@@ -3,9 +3,9 @@
 ### C# library for WebView2 Html to Pdf Generation
 
 > [!IMPORTANT]
-> This functionality library has bee moved into the [Westwind.WebView](https://github.com/RickStrahl/Westwind.WebView) library, keeping feature and syntax compatibility. You can just switch to the new library. 
+> This functionality library has been moved into the [Westwind.WebView](https://github.com/RickStrahl/Westwind.WebView) library, keeping feature and syntax compatibility. If you're using existing functionality you can switch to the new NuGet package and remove the old one. 
 >
-> To get code or get involved please use the new location:
+> To get source code or get involved please go to:
 > * [Westwind.WebView on GitHub](https://github.com/RickStrahl/Westwind.WebView)
 >
 > This repository is deprecated.
